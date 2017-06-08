@@ -18,11 +18,14 @@
   "devDependencies": {
     "babel-preset-es2015": "^6.24.1",
     "babelify": "^7.3.0",
-    "budo": "^10.0.3"
+    "browserify": "^14.4.0",
+    "budo": "^10.0.3",
+    "uglify-js": "^3.0.15"
   },
   "scripts": {
     "test": "node test.js",
-    "start": "budo index.js:bundle.js --live -- -t babelify"
+    "start": "budo index.js:bundle.js --live -- -t babelify",
+    "build": "browserify index.js -t babelify | uglifyjs -m -c warnings=false > bundle.js"
   },
   "keywords": [],
   "repository": {
