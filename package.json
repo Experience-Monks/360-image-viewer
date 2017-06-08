@@ -1,0 +1,36 @@
+{
+  "name": "360-image-viewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "license": "MIT",
+  "author": {
+    "name": "Matt DesLauriers",
+    "email": "dave.des@gmail.com",
+    "url": "https://github.com/mattdesl"
+  },
+  "dependencies": {
+    "orbit-controls": "^1.1.3",
+    "perspective-camera": "^2.0.1",
+    "primitive-sphere": "^3.0.0",
+    "regl": "^1.3.0"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^7.3.0",
+    "budo": "^10.0.3"
+  },
+  "scripts": {
+    "test": "node test.js",
+    "start": "budo index.js:bundle.js --live -- -t babelify"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Jam3/360-image-viewer.git"
+  },
+  "homepage": "https://github.com/Jam3/360-image-viewer",
+  "bugs": {
+    "url": "https://github.com/Jam3/360-image-viewer/issues"
+  }
+}
