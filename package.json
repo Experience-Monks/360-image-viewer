@@ -20,10 +20,13 @@
     "babelify": "^7.3.0",
     "browserify": "^14.4.0",
     "budo": "^10.0.3",
+    "surge": "^0.19.0",
     "uglify-js": "^3.0.15"
   },
   "scripts": {
     "test": "node test.js",
+    "deploy:upload": "surge -p . -d 360-image-viewer-test.surge.sh",
+    "deploy": "npm run build && npm run deploy:upload",
     "start": "budo index.js:bundle.js --live -- -t babelify",
     "build": "browserify index.js -t babelify | uglifyjs -m -c warnings=false > bundle.js"
   },

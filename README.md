@@ -1,6 +1,8 @@
 # 360-image-viewer
 
-Experiments.
+Experiments with `regl`, see the result here:
+
+http://360-image-viewer-test.surge.sh/
 
 ## Usage
 
