@@ -1,49 +1,69 @@
-const createSphere = require('primitive-sphere');
-const createControls = require('orbit-controls');
-const createCamera = require('perspective-camera');
-const createRegl = require('regl');
+var createSphere = require('primitive-sphere');
+var createControls = require('orbit-controls');
+var createCamera = require('perspective-camera');
+var createRegl = require('regl');
+var createLoop = require('raf-loop');
+var defined = require('defined');
+var assign = require('object-assign');
 
 // Generate some vertex data for a UV sphere
 // This can be re-used instead of computed each time
-const sphere = createSphere(1, {
-  segments: 64
-});
+var sphere;
+var EPSILON = Math.pow(2, -23);
 
 module.exports = create360Viewer;
-function create360Viewer (canvas, image) {
+function create360Viewer (opt) {
+  opt = opt || {};
+
+  var canvas = opt.canvas || document.createElement('canvas');
+
+  if (!sphere) {
+    sphere = createSphere(1, {
+      segments: 64
+    });
+  }
+
   // Create a new regl instance
-  const regl = createRegl({
+  var regl = createRegl({
     canvas: canvas
   });
 
   // Our perspective camera will hold projection/view matrices
-  const camera = createCamera({
-    fov: 40 * Math.PI / 180,
-    near: 0.01,
-    far: 1000
+  var camera = createCamera({
+    fov: defined(opt.fov, 40 * Math.PI / 180),
+    near: 0.1,
+    far: 10
   })
 
   // The mouse/touch input controls for the orbiting in 360
-  const controls = createControls({
-    canvas: canvas,
+  var controls = createControls(assign({}, opt, {
+    element: canvas,
     parent: window,
-    rotateSpeed: 0.15,
-    damping: 0.275,
+    rotateSpeed: defined(opt.rotateSpeed, 0.15),
+    damping: defined(opt.damping, 0.275),
     zoom: false,
     pinch: false,
     distance: 0
-  });
+  }));
+
+  // settings for gl.clear
+  var clearOpts = {
+    color: [ 0, 0, 0, 0 ],
+    depth: 1
+  };
+
+  var gl = regl._gl;
+  var destroyed = false;
+
+  // allow HTMLImageElement or unspecified image
+  var texture = regl.texture(getTextureParams(opt.image))
 
   // We create a new "mesh" that represents our 360 textured sphere
-  const drawMesh = regl({
+  var drawMesh = regl({
     // The uniforms for this shader
     uniforms: {
       // Creates a GPU texture from our Image
-      map: regl.texture({
-        data: image,
-        mag: 'linear',
-        min: 'linear'
-      }),
+      map: texture,
       // Camera matrices will have to be passed into this mesh
       projection: regl.prop('projection'),
       view: regl.prop('view')
@@ -81,22 +101,95 @@ function create360Viewer (canvas, image) {
     elements: regl.elements(sphere.cells)
   });
 
-  const frame = regl.frame(ev => {
-    const viewportWidth = ev.viewportWidth;
-    const viewportHeight = ev.viewportHeight;
+  // render first frame
+  render();
+
+  var api = createLoop(render);
+  api.canvas = canvas;
+  api.enableControls = controls.enable;
+  api.disableControls = controls.disable;
+  api.destroy = destroy;
+  api.render = render;
+
+  api.texture = function (opt) {
+    texture(getTextureParams(opt));
+  };
+
+  Object.defineProperties(api, {
+    fov: {
+      get: function () { return camera.fov; },
+      set: function (v) { camera.fov = v; }
+    },
+    phi: {
+      get: function () { return controls.phi; },
+      set: function (v) {
+        setPhiTheta(v, controls.theta);
+      }
+    },
+    theta: {
+      get: function () { return controls.theta; },
+      set: function (v) {
+        setPhiTheta(controls.phi, v);
+      }
+    }
+  });
+  api.controls = controls
+  return api;
+
+  function setPhiTheta (phi, theta) {
+    var dist = Math.max(EPSILON, controls.distance);
+    controls.position[0] = dist * Math.sin(phi) * Math.sin(theta);
+    controls.position[1] = dist * Math.cos(phi);
+    controls.position[2] = dist * Math.sin(phi) * Math.cos(theta);
+    controls.position[0] += controls.target[0];
+    controls.position[1] += controls.target[1];
+    controls.position[2] += controls.target[2];
+  }
+
+  function getTextureParams (image) {
+    var defaults = {
+      min: 'linear',
+      mag: 'linear'
+    };
+    if (image instanceof Image || image instanceof HTMLImageElement ||
+      image instanceof HTMLMediaElement || image instanceof HTMLVideoElement) {
+      var size = image.width * image.height;
+      return assign(defaults, {
+        data: size > 0 ? image : null
+      });
+    } else {
+      return assign(defaults, image);
+    }
+  }
+
+  function destroy () {
+    destroyed = true;
+    api.stop();
+    controls.disable();
+    regl.destroy();
+  }
+
+  function render () {
+    if (destroyed) return;
+
+    // poll for GL changes
+    regl.poll()
+
+    var viewportWidth = gl.drawingBufferWidth;
+    var viewportHeight = gl.drawingBufferHeight;
 
     // clear contents of the drawing buffer
-    regl.clear({
-      color: [ 0, 0, 0, 1 ],
-      depth: 1
-    });
+    regl.clear(clearOpts);
 
     // update input controls and copy into our perspective camera
     controls.update();
     controls.copyInto(camera.position, camera.direction, camera.up);
 
     // update camera viewport and matrices
-    camera.viewport = [ 0, 0, viewportWidth, viewportHeight ];
+    camera.viewport[0] = 0;
+    camera.viewport[1] = 0;
+    camera.viewport[2] = viewportWidth;
+    camera.viewport[3] = viewportHeight;
     camera.update();
 
     // draw our 360 sphere with the new camera matrices
@@ -104,11 +197,8 @@ function create360Viewer (canvas, image) {
       projection: camera.projection,
       view: camera.view
     });
-  });
 
-  // Setup an API for the user
-  regl.stop = frame.cancel;
-  regl.canvas = canvas;
-
-  return regl;
+    // flush all pending webgl calls
+    gl.flush()
+  }
 }

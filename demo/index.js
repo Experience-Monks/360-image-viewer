@@ -3,24 +3,42 @@ const getMaxTextureSize = require('./getMaxTextureSize');
 
 // Get a canvas of some sort, e.g. fullscreen or embedded in a site
 const canvas = createCanvas({
-  // comment this out to make the canvas full-screen
+  // without this, the canvas defaults to full-screen
   viewport: [ 20, 20, 500, 256 ]
 });
 document.body.appendChild(canvas);
 
-// Choose a large texture size based on our GPU
-const maxTextureSize = getMaxTextureSize();
-let imageUrl = 'pano_2048.jpg';
-if (maxTextureSize >= 8192) imageUrl = 'pano_8192.jpg';
-else if (maxTextureSize >= 4096) imageUrl = 'pano_4096.jpg';
-console.log('Max Texture Size is %d, loading %s', maxTextureSize, imageUrl);
+// Get the max image size possible
+const imageUrl = getImageURL();
 
 // Load your image
 const image = new Image();
 image.src = imageUrl;
 image.onload = () => {
-  // On load, setup the 360 canvas
-  create360Viewer(canvas, image);
+  // Setup the 360 viewer
+  const viewer = create360Viewer({
+    image: image,
+    canvas: canvas
+  });
+
+  // Start canvas render loop
+  viewer.start();
+
+  // For desktop, let's rotate the camera every frame while
+  // the user isn't interacting.
+  let isDragging = false;
+  canvas.addEventListener('mousedown', () => {
+    isDragging = true;
+  });
+  window.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  viewer.on('tick', (dt) => {
+    if (!isDragging) {
+      viewer.theta -= dt * 0.0001;
+    }
+  });
 };
 
 // Utility to create a device pixel scaled canvas
@@ -60,4 +78,13 @@ function createCanvas (opt = {}) {
   resizeCanvas();
   setupGrabCursor();
   return canvas;
+}
+
+function getImageURL () {
+  // Choose a large texture size based on our GPU
+  const maxTextureSize = getMaxTextureSize();
+  let imageUrl = 'pano_2048.jpg';
+  if (maxTextureSize >= 8192) imageUrl = 'pano_8192.jpg';
+  else if (maxTextureSize >= 4096) imageUrl = 'pano_4096.jpg';
+  return imageUrl;
 }
