@@ -89,7 +89,7 @@ function create360Viewer (canvas, image) {
     elements: regl.elements(sphere.cells)
   });
 
-  regl.frame(({ viewportWidth, viewportHeight }) => {
+  const frame = regl.frame(({ viewportWidth, viewportHeight }) => {
     // clear contents of the drawing buffer
     regl.clear({
       color: [ 0, 0, 0, 1 ],
@@ -111,6 +111,12 @@ function create360Viewer (canvas, image) {
       view: camera.view
     });
   });
+
+  // Setup an API for the user
+  regl.stop = frame.cancel;
+  regl.canvas = canvas;
+
+  return regl;
 }
 
 // Utility to create a full-screen, device pixel scaled canvas
