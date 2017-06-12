@@ -3,39 +3,32 @@ const createControls = require('orbit-controls');
 const createCamera = require('perspective-camera');
 const createRegl = require('regl');
 
-// Get a canvas of some sort, e.g. fullscreen or embedded in a site
-const canvas = createFullscreenCanvas();
-
-// Load your image
-const image = new Image();
-image.src = 'street.jpg';
-image.onload = () => {
-  // On load, setup the 360 canvas
-  create360Viewer(canvas, image);
-};
-
 // Generate some vertex data for a UV sphere
 // This can be re-used instead of computed each time
 const sphere = createSphere(1, {
   segments: 64
 });
 
+module.exports = create360Viewer;
 function create360Viewer (canvas, image) {
   // Create a new regl instance
   const regl = createRegl({
-    canvas
+    canvas: canvas
   });
 
   // Our perspective camera will hold projection/view matrices
   const camera = createCamera({
-    fov: 60 * Math.PI / 180,
+    fov: 40 * Math.PI / 180,
     near: 0.01,
     far: 1000
   })
 
   // The mouse/touch input controls for the orbiting in 360
   const controls = createControls({
-    canvas,
+    canvas: canvas,
+    parent: window,
+    rotateSpeed: 0.15,
+    damping: 0.275,
     zoom: false,
     pinch: false,
     distance: 0
@@ -56,30 +49,29 @@ function create360Viewer (canvas, image) {
       view: regl.prop('view')
     },
     // The fragment shader
-    frag: `
-      precision highp float;
-      uniform sampler2D map;
-      uniform vec4 color;
-      varying vec2 vUv;
-      void main() {
-        vec2 uv = 1.0 - vUv;
-        gl_FragColor = texture2D(map, uv);
-      }`,
+    frag: [
+      'precision highp float;',
+      'uniform sampler2D map;',
+      'uniform vec4 color;',
+      'varying vec2 vUv;',
+      'void main() {',
+      '  vec2 uv = 1.0 - vUv;',
+      '  gl_FragColor = texture2D(map, uv);',
+      '}',
+    ].join('\n'),
     // The vertex shader
-    vert: `
-      precision highp float;
-      attribute vec3 position;
-      attribute vec2 uv;
-
-      uniform mat4 projection;
-      uniform mat4 view;
-
-      varying vec2 vUv;
-
-      void main() {
-        vUv = uv;
-        gl_Position = projection * view * vec4(position.xyz, 1.0);
-      }`,
+    vert: [
+      'precision highp float;',
+      'attribute vec3 position;',
+      'attribute vec2 uv;',
+      'uniform mat4 projection;',
+      'uniform mat4 view;',
+      'varying vec2 vUv;',
+      'void main() {',
+      '  vUv = uv;',
+      '  gl_Position = projection * view * vec4(position.xyz, 1.0);',
+      '}'
+    ].join('\n'),
     // The attributes of the mesh, position and uv (texture coordinate)
     attributes: {
       position: regl.buffer(sphere.positions),
@@ -89,13 +81,15 @@ function create360Viewer (canvas, image) {
     elements: regl.elements(sphere.cells)
   });
 
-  const frame = regl.frame(({ viewportWidth, viewportHeight }) => {
+  const frame = regl.frame(ev => {
+    const viewportWidth = ev.viewportWidth;
+    const viewportHeight = ev.viewportHeight;
+
     // clear contents of the drawing buffer
     regl.clear({
       color: [ 0, 0, 0, 1 ],
       depth: 1
     });
-
 
     // update input controls and copy into our perspective camera
     controls.update();
@@ -117,28 +111,4 @@ function create360Viewer (canvas, image) {
   regl.canvas = canvas;
 
   return regl;
-}
-
-// Utility to create a full-screen, device pixel scaled canvas
-function createFullscreenCanvas () {
-  const canvas = document.createElement('canvas');
-  canvas.style.position = 'absolute';
-  canvas.style.top = '0';
-  canvas.style.left = '0';
-
-  const resizeCanvas = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const dpr = window.devicePixelRatio;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-  };
-
-  document.body.appendChild(canvas);
-
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
-  return canvas;
 }
