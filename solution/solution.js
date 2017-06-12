@@ -49,29 +49,29 @@ function create360Viewer (canvas, image) {
       view: regl.prop('view')
     },
     // The fragment shader
-    frag: [
-      'precision highp float;',
-      'uniform sampler2D map;',
-      'uniform vec4 color;',
-      'varying vec2 vUv;',
-      'void main() {',
-      '  vec2 uv = 1.0 - vUv;',
-      '  gl_FragColor = texture2D(map, uv);',
-      '}',
-    ].join('\n'),
+    frag: `
+      precision highp float;
+      uniform sampler2D map;
+      uniform vec4 color;
+      varying vec2 vUv;
+      void main() {
+        vec2 uv = 1.0 - vUv;
+        gl_FragColor = texture2D(map, uv);
+      }
+    `,
     // The vertex shader
-    vert: [
-      'precision highp float;',
-      'attribute vec3 position;',
-      'attribute vec2 uv;',
-      'uniform mat4 projection;',
-      'uniform mat4 view;',
-      'varying vec2 vUv;',
-      'void main() {',
-      '  vUv = uv;',
-      '  gl_Position = projection * view * vec4(position.xyz, 1.0);',
-      '}'
-    ].join('\n'),
+    vert: `
+      precision highp float;
+      attribute vec3 position;
+      attribute vec2 uv;
+      uniform mat4 projection;
+      uniform mat4 view;
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projection * view * vec4(position.xyz, 1.0);
+      }
+    `,
     // The attributes of the mesh, position and uv (texture coordinate)
     attributes: {
       position: regl.buffer(sphere.positions),
@@ -81,10 +81,7 @@ function create360Viewer (canvas, image) {
     elements: regl.elements(sphere.cells)
   });
 
-  const frame = regl.frame(ev => {
-    const viewportWidth = ev.viewportWidth;
-    const viewportHeight = ev.viewportHeight;
-
+  const frame = regl.frame(({ viewportWidth, viewportHeight }) => {
     // clear contents of the drawing buffer
     regl.clear({
       color: [ 0, 0, 0, 1 ],
