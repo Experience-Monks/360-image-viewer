@@ -32,7 +32,7 @@
     "deploy:upload": "surge -p demo -d 360-image-viewer-test.surge.sh",
     "deploy": "npm run build && npm run deploy:upload",
     "start": "budo demo/index.js:bundle.js --dir demo --live -- -t babelify",
-    "build": "browserify index.js -t babelify | uglifyjs -m -c warnings=false > bundle.js"
+    "build": "browserify index.js -t babelify | uglifyjs -m -c warnings=false > demo/bundle.js"
   },
   "keywords": [],
   "repository": {
