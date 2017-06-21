@@ -9,7 +9,6 @@ var assign = require('object-assign');
 // Generate some vertex data for a UV sphere
 // This can be re-used instead of computed each time
 var sphere;
-var EPSILON = Math.pow(2, -23);
 
 module.exports = create360Viewer;
 function create360Viewer (opt) {
@@ -30,7 +29,7 @@ function create360Viewer (opt) {
 
   // Our perspective camera will hold projection/view matrices
   var camera = createCamera({
-    fov: defined(opt.fov, 40 * Math.PI / 180),
+    fov: defined(opt.fov, 45 * Math.PI / 180),
     near: 0.1,
     far: 10
   })
@@ -39,8 +38,8 @@ function create360Viewer (opt) {
   var controls = createControls(assign({}, opt, {
     element: canvas,
     parent: window,
-    rotateSpeed: defined(opt.rotateSpeed, 0.15),
-    damping: defined(opt.damping, 0.275),
+    rotateSpeed: defined(opt.rotateSpeed, 0.75 / (Math.PI * 2)),
+    damping: defined(opt.damping, 0.35),
     zoom: false,
     pinch: false,
     distance: 0
@@ -101,10 +100,9 @@ function create360Viewer (opt) {
     elements: regl.elements(sphere.cells)
   });
 
-  // render first frame
-  render();
-
   var api = createLoop(render);
+
+  api.clearColor = opt.clearColor || clearOpts.color;
   api.canvas = canvas;
   api.enableControls = controls.enable;
   api.disableControls = controls.disable;
@@ -115,36 +113,14 @@ function create360Viewer (opt) {
     texture(getTextureParams(opt));
   };
 
-  Object.defineProperties(api, {
-    fov: {
-      get: function () { return camera.fov; },
-      set: function (v) { camera.fov = v; }
-    },
-    phi: {
-      get: function () { return controls.phi; },
-      set: function (v) {
-        setPhiTheta(v, controls.theta);
-      }
-    },
-    theta: {
-      get: function () { return controls.theta; },
-      set: function (v) {
-        setPhiTheta(controls.phi, v);
-      }
-    }
-  });
-  api.controls = controls
-  return api;
+  api.controls = controls;
+  api.camera = camera;
+  api.gl = gl;
 
-  function setPhiTheta (phi, theta) {
-    var dist = Math.max(EPSILON, controls.distance);
-    controls.position[0] = dist * Math.sin(phi) * Math.sin(theta);
-    controls.position[1] = dist * Math.cos(phi);
-    controls.position[2] = dist * Math.sin(phi) * Math.cos(theta);
-    controls.position[0] += controls.target[0];
-    controls.position[1] += controls.target[1];
-    controls.position[2] += controls.target[2];
-  }
+  // render first frame
+  render();
+
+  return api;
 
   function getTextureParams (image) {
     var defaults = {
@@ -175,10 +151,11 @@ function create360Viewer (opt) {
     // poll for GL changes
     regl.poll()
 
-    var viewportWidth = gl.drawingBufferWidth;
-    var viewportHeight = gl.drawingBufferHeight;
+    var width = gl.drawingBufferWidth;
+    var height = gl.drawingBufferHeight;
 
     // clear contents of the drawing buffer
+    clearOpts.color = api.clearColor;
     regl.clear(clearOpts);
 
     // update input controls and copy into our perspective camera
@@ -188,8 +165,8 @@ function create360Viewer (opt) {
     // update camera viewport and matrices
     camera.viewport[0] = 0;
     camera.viewport[1] = 0;
-    camera.viewport[2] = viewportWidth;
-    camera.viewport[3] = viewportHeight;
+    camera.viewport[2] = width;
+    camera.viewport[3] = height;
     camera.update();
 
     // draw our 360 sphere with the new camera matrices

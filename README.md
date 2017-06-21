@@ -51,11 +51,12 @@ Options:
 
 - `image` — the HTMLImageElement, if not specified it can be set later
 - `canvas` —  a `<canvas>` tag to use, otherwise creates a new one
-- `fov` — a field of view, in radians, defaults to 40 degrees
-- `rotateSpeed` — a scalar for the rotation speed, default 0.15
+- `fov` — a field of view, in radians, defaults to 45 degrees
+- `rotateSpeed` — a scalar for the drag rotation speed, default 0.15
 - `damping` — a scalar for damping/spring, default 0.275
+- `clearColor` — a RGBA clear color, default `[ 0, 0, 0, 0 ]` (ie. transparent)
 
-You can also pass [orbit-controls](https://github.com/Jam3/orbit-controls) options for initial angle (in phi, theta) and the rotation bounds.
+You can also pass [orbit-controls](https://github.com/Jam3/orbit-controls) options, for example `phi` as the initial rotation, or passing `{ rotate: fale }` to ignore mouse/touch rotation.
 
 The `image` should be a DOM Image or Video element, and should already be loaded.
 

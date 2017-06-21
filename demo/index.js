@@ -4,7 +4,7 @@ const getMaxTextureSize = require('./getMaxTextureSize');
 // Get a canvas of some sort, e.g. fullscreen or embedded in a site
 const canvas = createCanvas({
   // without this, the canvas defaults to full-screen
-  viewport: [ 20, 20, 500, 256 ]
+  // viewport: [ 20, 20, 500, 256 ]
 });
 document.body.appendChild(canvas);
 
@@ -24,19 +24,9 @@ image.onload = () => {
   // Start canvas render loop
   viewer.start();
 
-  // For desktop, let's rotate the camera every frame while
-  // the user isn't interacting.
-  let isDragging = false;
-  canvas.addEventListener('mousedown', () => {
-    isDragging = true;
-  });
-  window.addEventListener('mouseup', () => {
-    isDragging = false;
-  });
-
   viewer.on('tick', (dt) => {
-    if (!isDragging) {
-      viewer.theta -= dt * 0.0001;
+    if (!viewer.controls.dragging) {
+      // viewer.controls.theta -= dt * 0.0001;
     }
   });
 };
