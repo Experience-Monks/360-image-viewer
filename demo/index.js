@@ -1,5 +1,6 @@
 const create360Viewer = require('../');
 const getMaxTextureSize = require('./getMaxTextureSize');
+const dragDrop = require('drag-drop');
 
 // Get a canvas of some sort, e.g. fullscreen or embedded in a site
 const canvas = createCanvas({
@@ -11,6 +12,9 @@ document.body.appendChild(canvas);
 // Get the max image size possible
 const imageUrl = getImageURL();
 
+// whether to always rotate the view
+const autoSpin = false;
+
 // Load your image
 const image = new Image();
 image.src = imageUrl;
@@ -21,12 +25,14 @@ image.onload = () => {
     canvas: canvas
   });
 
+  setupDragDrop(canvas, viewer);
+
   // Start canvas render loop
   viewer.start();
 
   viewer.on('tick', (dt) => {
-    if (!viewer.controls.dragging) {
-      // viewer.controls.theta -= dt * 0.0001;
+    if (autoSpin && !viewer.controls.dragging) {
+      viewer.controls.theta -= dt * 0.00005;
     }
   });
 };
@@ -77,4 +83,20 @@ function getImageURL () {
   if (maxTextureSize >= 8192) imageUrl = 'pano_8192.jpg';
   else if (maxTextureSize >= 4096) imageUrl = 'pano_4096.jpg';
   return imageUrl;
+}
+
+function setupDragDrop (canvas, viewer) {
+  dragDrop(canvas, {
+    onDrop: (files) => {
+      var img = new Image();
+      img.onload = () => {
+        viewer.texture(img);
+      };
+      img.onerror = () => {
+        alert('Could not load image!');
+      };
+      img.crossOrigin = 'Anonymous';
+      img.src = URL.createObjectURL(files[0]);
+    }
+  });
 }
