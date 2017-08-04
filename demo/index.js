@@ -2,12 +2,14 @@ const create360Viewer = require('../');
 const getMaxTextureSize = require('./getMaxTextureSize');
 const dragDrop = require('drag-drop');
 
+const dropRegion = document.querySelector('#drop-region');
+
 // Get a canvas of some sort, e.g. fullscreen or embedded in a site
 const canvas = createCanvas({
+  canvas: document.querySelector('#canvas'),
   // without this, the canvas defaults to full-screen
   // viewport: [ 20, 20, 500, 256 ]
 });
-document.body.appendChild(canvas);
 
 // Get the max image size possible
 const imageUrl = getImageURL();
@@ -42,7 +44,7 @@ function createCanvas (opt = {}) {
   // default to full screen (no width/height specified)
   const viewport = opt.viewport || [ 0, 0 ];
 
-  const canvas = document.createElement('canvas');
+  const canvas = opt.canvas || document.createElement('canvas');
   canvas.style.position = 'absolute';
   canvas.style.top = `${viewport[0]}px`;
   canvas.style.left = `${viewport[1]}px`;
@@ -87,6 +89,12 @@ function getImageURL () {
 
 function setupDragDrop (canvas, viewer) {
   dragDrop(canvas, {
+    onDragEnter: () => {
+      dropRegion.style.display = '';
+    },
+    onDragLeave: () => {
+      dropRegion.style.display = 'none';
+    },
     onDrop: (files) => {
       var img = new Image();
       img.onload = () => {

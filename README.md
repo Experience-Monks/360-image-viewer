@@ -1,8 +1,6 @@
 # 360-image-viewer
 
-Experiments with `regl`, see the demo here:
-
-[(demo)](http://360-image-viewer-test.surge.sh/)
+A standalone panorama WebGL image viewer for desktop and mobile. This uses [regl](https://www.npmjs.com/package/regl) as the WebGL wrapper, and comes in at a total of 140kb uglified, or 46kb gzipped. This is useful if you need a panorama viewer but don't want to embed all of ThreeJS (which is around 500kb uglified).
 
 ## Install
 
@@ -10,9 +8,15 @@ Experiments with `regl`, see the demo here:
 npm install 360-image-viewer --save
 ```
 
+## Live Demo
+
+Click [here](http://360-image-viewer-test.surge.sh/) to see a demo of this module in action. The source code is in [demo/index.js](./demo/index.js).
+
+[<img src="demo/screenshot.jpg" width="75%" />](http://360-image-viewer-test.surge.sh/)
+
 ## Example
 
-The code below sets up a full-screen 360 image viewer. For a more complete example, see [./demo/index.js](./demo/index.js).
+The code below sets up a full-screen 360 image viewer. For a more complete example, see [demo/index.js](./demo/index.js).
 
 ```js
 const create360Viewer = require('360-image-viewer');
