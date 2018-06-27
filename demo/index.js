@@ -4,6 +4,14 @@ const dragDrop = require('drag-drop');
 
 const dropRegion = document.querySelector('#drop-region');
 
+const PI2 = 2 * Math.PI;  // Stores the twice the value of pi (1 full rotation)
+var autoSpin = false;     // whether to always rotate the view
+var panUp = true;         // initial vertical scroll direction
+var shift = false;        // if the shift key is pressed
+var initMouse = [0, 0]    // initial cursor position
+var currMouse = [0, 0]    // current cursor position
+var focused = true;       // if the document has focus
+
 // Get a canvas of some sort, e.g. fullscreen or embedded in a site
 const canvas = createCanvas({
   canvas: document.querySelector('#canvas'),
@@ -13,9 +21,6 @@ const canvas = createCanvas({
 
 // Get the max image size possible
 const imageUrl = getImageURL();
-
-// whether to always rotate the view
-const autoSpin = false;
 
 // Load your image
 const image = new Image();
@@ -32,10 +37,37 @@ image.onload = () => {
   // Start canvas render loop
   viewer.start();
 
+  viewerSetup(viewer);
+
   viewer.on('tick', (dt) => {
-    if (autoSpin && !viewer.controls.dragging) {
-      viewer.controls.theta -= dt * 0.00005;
-    }
+    var txt = "";
+    txt += viewer.controls.theta;
+    txt += " ";
+    txt += viewer.controls.phi;
+    document.getElementById("position").innerHTML = txt;
+
+    if (shift) {
+      // Handle cursor-guided scrolling
+      viewer.controls.theta += (initMouse[0] - currMouse[0]) * 0.000065;
+      viewer.controls.phi += (initMouse[1] - currMouse[1]) * 0.000035;
+    } else if (focus){
+        
+        // Handle auto scrolling
+        if (autoSpin && !viewer.controls.dragging) {
+          dt = dt < 20 ? dt : 16.8;
+          viewer.controls.theta -= dt * 0.00005;
+          panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
+          panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
+          viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1);
+          // if (viewer.controls.phi >= 0.61 * Math.PI || viewer.controls.phi <= 0.479 * Math.PI) {
+          //   console.log("i'm not supposed be here: " + (viewer.controls.phi / Math.PI));
+          //   viewer.controls.phi = 0.57 * Math.PI;
+          // }
+        }
+      } 
+      // else {
+      //   console.log("i've lost focus");
+      // }
   });
 };
 
@@ -107,4 +139,102 @@ function setupDragDrop (canvas, viewer) {
       img.src = URL.createObjectURL(files[0]);
     }
   });
+}
+
+function viewerSetup(viewer) {
+
+  // Determine when document has focus
+  document.addEventListener("visibilitychange", function() {
+    focus = !focus;
+    console.log(focus ? "gained focus" : "lost focus");
+  })
+
+  // Set up key handlers
+  document.body.onkeydown = checkKeyDown;
+  document.body.onkeyup = checkKeyUp;
+  document.addEventListener("mousemove", mouseHandler);
+  document.getElementById("invert").addEventListener("change", invertDrag);
+  document.getElementById("toggle").addEventListener("change", toggleSpin);
+
+  // Set up button handlers
+  document.getElementById("spin").addEventListener("click", toggleSpinKeyDown);
+  document.getElementById("left").addEventListener("click", moveLeft);
+  document.getElementById("right").addEventListener("click", moveRight);
+
+  // Calls helper methods based on which keys pressed
+  function checkKeyDown(e) {
+    e = e || window.event;
+    switch (e.keyCode) {
+      // shift
+      case 16: shiftDown(); break;
+      // space
+      case 32: toggleSpinKeyDown(); break;
+      // left arrow
+      case 37: moveLeft(); break;
+      // up arrow
+      case 38: moveUp(); break;
+      // right arrow
+      case 39: moveRight(); break;
+      // down arrow
+      case 40: moveDown(); break;
+    }
+  }
+  
+  // Calls helper methods based on which keys released
+  function checkKeyUp(e) {
+    e = e || window.event;
+    switch (e.keyCode) {
+      // shift
+      case 16: shiftUp(); break;
+    }
+  }
+
+  ///////////////////////////////////////
+  // Helper Functions
+  ///////////////////////////////////////
+
+  // Makes a full rotation left in 12 steps
+  function moveLeft() {
+    viewer.controls.theta += PI2 / 12;
+  }
+  // Makes a full rotation right in 12 steps
+  function moveRight() {
+    viewer.controls.theta -= PI2 / 12;
+  }
+  // Makes a half rotation up in 15 steps
+  function moveUp() {
+    viewer.controls.phi += Math.PI / 15;
+  }
+  // Makes a half rotation down in 15 steps
+  function moveDown() {
+    viewer.controls.phi -= Math.PI / 15;
+  }
+  // Toggles auto spin on key down
+  function toggleSpinKeyDown() {
+    document.getElementById("toggle").checked = !document.getElementById("toggle").checked;
+    toggleSpin();
+  }
+  // Toggles auto spin
+  function toggleSpin() {
+    autoSpin = !autoSpin;
+  }
+  // Triggers when shift is held down
+  function shiftDown() {
+    shift = true;
+    initMouse = currMouse;
+  }
+  // Triggers when shift is released
+  function shiftUp() {
+    shift = false;
+  }
+  // Constantly caching the mouse's position
+  function mouseHandler(event) {
+    var x = event.clientX;
+    var y = event.clientY;
+    currMouse = [x, y];
+  }
+  // Inverts the controls for dragging
+  function invertDrag() {
+    viewer.controls.rotateSpeed = -viewer.controls.rotateSpeed;
+  }
 }

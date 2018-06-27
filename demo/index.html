@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <title>360-image-viewer</title>
+  <title>My 360-image-viewer</title>
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
   <style>
   body {
@@ -17,12 +17,29 @@
     -webkit-tap-highlight-color:rgba(0,0,0,0);
     -webkit-user-select:none;
   }
+  .display {
+    width: 100px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 20px;
+    display: block;
+    background: black;
+  }
   .info {
     position: absolute;
     bottom: 0;
     left: 0;
     margin: 20px;
-    pointer-events: none;
+    pointer-events: auto; /* Previously set to none */
+  }
+  .info2 {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 20px;
+    text-align: right;
   }
   .hr {
     width: 20px;
@@ -30,6 +47,7 @@
     margin: 0;
     padding: 0;
     margin-bottom: 10px;
+    /* float: right; */
     display: block;
     background: white;
     vertical-align: middle;
@@ -50,6 +68,20 @@
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing; 
   }
+  .left {
+    position: absolute;
+    bottom: 50%;
+    left: 0;
+    margin: 20px;
+    pointer-events: auto; /* Previously set to none */
+  }
+  .right {
+    position: absolute;
+    bottom: 50%;
+    right: 0;
+    margin: 20px;
+    pointer-events: auto; /* Previously set to none */
+  }
   #drop-region {
     position: absolute;
     top: 5px;
@@ -66,12 +98,30 @@
   }
   </style>
 </head>
+
+
 <body>
   <canvas id="canvas"></canvas>
-  <div class="info">
-    <div class="hr"></div>
-    <p>Drop an equirectangular JPG or PNG here to view it in 360º</p>
+  <div class="display">
+    <p id="position"></p>
   </div>
+  <button class="right" id="right">Move right</button>
+  <button class="left" id="left">Move left</button>
+    
+    <div class="info">
+      <div class="hr"></div>
+      <p>Drop an equirectangular JPG or PNG here to view it in 360º</p>
+      <p>Invert Drag Controls <input type="checkbox" id="invert"></p>
+      <button id="spin">Spin!</button>
+      <!-- <button id="left">Move left</button> -->
+      <p>Automatic scrolling <input type="checkbox" id="toggle"></p>
+    </div>
+  <!-- <div class="info2">
+    <div class="hr"></div>
+    <p>Press SPACE to toggle auto spin</p>
+    <p>Use the ARROW KEYS to move around</p>
+    <p>Hold SHIFT and move the cursor to pan around</p>
+  </div> -->
   <div id="drop-region" style="display: none;"></div>
   <script src="bundle.js"></script>
 </body>

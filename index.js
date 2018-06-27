@@ -40,8 +40,8 @@ function create360Viewer (opt) {
     parent: window,
     rotateSpeed: defined(opt.rotateSpeed, 0.75 / (Math.PI * 2)),
     damping: defined(opt.damping, 0.35),
-    zoom: false,
-    pinch: false,
+    zoom: true,
+    pinch: true,
     distance: 0
   }));
 
