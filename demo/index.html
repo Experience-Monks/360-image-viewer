@@ -68,6 +68,10 @@
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing; 
   }
+  .button{
+    width: 30px;
+    height: 30px;
+  }
   .left {
     position: absolute;
     bottom: 50%;
@@ -105,18 +109,19 @@
   <div class="display">
     <p id="position"></p>
   </div>
-  <button class="right" id="right">Move right</button>
-  <button class="left" id="left">Move left</button>
+  <img class="left button" id="left" src="left.png">
+  <img class="right button" id="right" src="right.png">
+  <!-- <button class="right" id="right">Move right</button> -->
+  <!-- <button class="left" id="left">Move left</button> -->
     
     <div class="info">
       <div class="hr"></div>
       <p>Drop an equirectangular JPG or PNG here to view it in 360º</p>
-      <p>Invert Drag Controls <input type="checkbox" id="invert"></p>
       <button id="spin">Spin!</button>
-      <!-- <button id="left">Move left</button> -->
       <p>Automatic scrolling <input type="checkbox" id="toggle"></p>
+      <p>Invert Drag Controls <input type="checkbox" id="invert"></p>
     </div>
-  <!-- <div class="info2">
+    <!-- <div class="info2">
     <div class="hr"></div>
     <p>Press SPACE to toggle auto spin</p>
     <p>Use the ARROW KEYS to move around</p>

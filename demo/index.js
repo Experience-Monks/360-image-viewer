@@ -4,7 +4,6 @@ const dragDrop = require('drag-drop');
 
 const dropRegion = document.querySelector('#drop-region');
 
-const PI2 = 2 * Math.PI;  // Stores the twice the value of pi (1 full rotation)
 var autoSpin = false;     // whether to always rotate the view
 var panUp = true;         // initial vertical scroll direction
 var shift = false;        // if the shift key is pressed
@@ -192,6 +191,8 @@ function viewerSetup(viewer) {
   ///////////////////////////////////////
   // Helper Functions
   ///////////////////////////////////////
+
+  const PI2 = 2 * Math.PI;  // Stores the twice the value of pi (1 full rotation)
 
   // Makes a full rotation left in 12 steps
   function moveLeft() {

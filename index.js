@@ -38,7 +38,7 @@ function create360Viewer (opt) {
   var controls = createControls(assign({}, opt, {
     element: canvas,
     parent: window,
-    rotateSpeed: defined(opt.rotateSpeed, 0.75 / (Math.PI * 2)),
+    rotateSpeed: defined(opt.rotateSpeed, -0.75 / (Math.PI * 2)), // negative to invert
     damping: defined(opt.damping, 0.35),
     zoom: true,
     pinch: true,
