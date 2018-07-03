@@ -30,7 +30,7 @@ export class HomePage {
   constructor(public navCtrl: NavController, public platform: Platform) {
     // alert("constructor");
     mobile = this.platform.is('mobileweb') ? true : false;
-    // check();
+{    // check();
     
     // this.myLeft.onclick = () => {
     //   alert("left");
@@ -120,7 +120,7 @@ export class HomePage {
     //     });
     //   }
     // };
-    
+    }
   }
   
   
@@ -129,6 +129,8 @@ export class HomePage {
 window.onload = () => {
   // alert("onload");
   check();
+  if (!mobile)
+    (<HTMLElement>document.getElementsByClassName("info2")[0]).style.display = "";
   document.getElementById('left').onclick = () => {
     alert("left");
   }
@@ -141,10 +143,10 @@ window.onload = () => {
     // viewport: [ 20, 20, 500, 256 ]
   });
 
+  alert("hi");
   // Load your image
   const image = new Image();
-  image.src = "../../assets/imgs/pano.png";
-  alert("hi");
+
   image.onload = () => {
     // Setup the 360 viewer
     const viewer = create360Viewer({
@@ -191,6 +193,8 @@ window.onload = () => {
         // }
     });
 
+    image.src = "../../assets/imgs/pano.jpg";
+
     function setupDragDrop (canvas, viewer) {
       dragDrop(canvas, {
         onDragEnter: () => {
@@ -213,6 +217,8 @@ window.onload = () => {
       });
     }
   };
+
+  alert('yes')
 }
 
 

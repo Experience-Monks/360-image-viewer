@@ -1,0 +1,57 @@
+{
+  "_from": "cordova-plugin-ionic-webview@1.1.19",
+  "_id": "cordova-plugin-ionic-webview@1.1.19",
+  "_inBundle": false,
+  "_integrity": "sha512-Sgs6eHWsVFYBuc2xVhA3JqV7d7Wac6Yj1ZJjBLrhaA60LlMV8pReaPvWr898DKoLfhlBhJqNBEJSUAVP/4G9FA==",
+  "_location": "/cordova-plugin-ionic-webview",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "cordova-plugin-ionic-webview@1.1.19",
+    "name": "cordova-plugin-ionic-webview",
+    "escapedName": "cordova-plugin-ionic-webview",
+    "rawSpec": "1.1.19",
+    "saveSpec": null,
+    "fetchSpec": "1.1.19"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-ionic-webview/-/cordova-plugin-ionic-webview-1.1.19.tgz",
+  "_shasum": "7f18d30291153c4066f529399a8d8226aa4fb28e",
+  "_spec": "cordova-plugin-ionic-webview@1.1.19",
+  "_where": "/Users/william/Documents/GitHub/my360-image-viewer",
+  "author": {
+    "name": "Ionic Team"
+  },
+  "bugs": {
+    "url": "https://github.com/ionic-team/cordova-plugin-ionic-webview/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "The official Ionic's WKWebView Engine Plugin",
+  "devDependencies": {
+    "np": "^2.16.0",
+    "sync-cordova-xml": "^0.4.0"
+  },
+  "homepage": "https://github.com/ionic-team/cordova-plugin-ionic-webview#readme",
+  "keywords": [
+    "cordova",
+    "wkwebview"
+  ],
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "name": "cordova-plugin-ionic-webview",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ionic-team/cordova-plugin-ionic-webview.git"
+  },
+  "scripts": {
+    "deploy": "np --yolo",
+    "sync_plugin_xml": "sync-cordova-xml package.json plugin.xml --output=plugin.xml",
+    "version": "npm run sync_plugin_xml && git add plugin.xml"
+  },
+  "version": "1.1.19"
+}
