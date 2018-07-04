@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-gyroscope"
+        version="0.1.4">
+
+  <name>Device Gyroscope</name>
+  <description>Cordova Device Gyroscope Plugin</description>
+  <author>Jason Yang</author>
+  <license>BSD</license>
+
+  <js-module src="www/Orientation.js" name="Orientation">
+    <clobbers target="Orientation"/>
+  </js-module>
+
+  <js-module src="www/gyroscope.js" name="gyroscope">
+    <clobbers target="navigator.gyroscope"/>
+  </js-module>
+
+  <!-- android -->
+  <platform name="android">
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Gyroscope">
+        <param name="android-package" value="com.android.plugins.GyroscopeListener"/>
+      </feature>
+    </config-file>
+
+    <source-file src="src/android/com/android/plugins/GyroscopeListener.java" target-dir="src/com/android/plugins"/>
+
+  </platform>
+
+  <!-- ios -->
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="Gyroscope">
+        <param name="ios-package" value="CDVGyroscope"/>
+      </feature>
+    </config-file>
+
+    <header-file src="src/ios/CDVGyroscope.h"/>
+    <source-file src="src/ios/CDVGyroscope.m"/>
+
+    <framework src="CoreMotion.framework"/>
+  </platform>
+
+</plugin>

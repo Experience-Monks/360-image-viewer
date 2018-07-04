@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
+import { Gyroscope, GyroscopeOrientation, GyroscopeOptions } from '@ionic-native/gyroscope';
 import { Platform } from 'ionic-angular';
+
 
 import * as create360Viewer from '360-image-viewer';
 import * as dragDrop from 'drag-drop';
-// import { canvasFit } from 'canvas-fit';
-// const create360Viewer = require('360-image-viewer');
-// const canvasFit = require('canvas-fit');
 
 var mobile = false;
 
@@ -24,41 +23,50 @@ var focus = true;       // if the document has focus
 
 
 export class HomePage {
-  constructor(public navCtrl: NavController, public platform: Platform) {
+  constructor(public navCtrl: NavController, public platform: Platform, private gyroscope: Gyroscope) {
     mobile = this.platform.is('mobileweb') ? true : false;
+    if (mobile) {
+      let options: GyroscopeOptions = {
+        frequency: 1000
+      };
+      
+      this.gyroscope.getCurrent(options)
+       .then((orientation: GyroscopeOrientation) => {
+          console.log(orientation.x, orientation.y, orientation.z, orientation.timestamp);
+        })
+       .catch()
+    }
   }
 }
 
+
+
+
 window.onload = () => {
-  check();
+  alert(mobile ? "mobile!" : "computer!");
   if (!mobile)
     (<HTMLElement>document.getElementsByClassName("info2")[0]).style.display = "";
   
-  document.getElementById('left').onclick = () => {
-    alert("left");
-  }
-
   const dropRegion = document.querySelector('#drop-region');
-  if (dropRegion)
-    console.log("dropregion didn't fail");
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
   const canvas = createCanvas({
     canvas: document.querySelector('#canvas'),
     // without this, the canvas defaults to full-screen
     // viewport: [ 20, 20, 500, 256 ]
   });
-  
 
-  alert("hi");
   // Load your image
   const image = new Image();
-
 
   image.onload = () => {
     // Setup the 360 viewer
     const viewer = create360Viewer({ 
       image: image, 
-      canvas: canvas 
+      canvas: canvas,
+      damping: 0.2,
+      zoom: true,       // Need to change in index.js
+      pinching: true,   // Need to change in index.js
+      distanceBounds: [0, 1.05],
     });
 
     setupDragDrop(canvas, viewer);
@@ -120,19 +128,6 @@ window.onload = () => {
   image.src = "../../assets/imgs/pano.jpg";
 }
 
-
-function check() {
-  alert(mobile ? "mobile!" : "computer!")
-}
-
-
-
-
-
-
-
-
-
 // Utility to create a device pixel scaled canvas
 function createCanvas (opt = <any>{}) {
   // default to full screen (no width/height specified)
@@ -172,14 +167,7 @@ function createCanvas (opt = <any>{}) {
   return canvas;
 }
 
-// function getImageURL () {
-//   return "./assets/imgs/pano.png";
-// }
-
-
-
 function viewerSetup(viewer) {
-
   // Determine when document has focus
   document.addEventListener("visibilitychange", function() {
     focus = !focus;
@@ -188,6 +176,11 @@ function viewerSetup(viewer) {
 
   // Personal Preference
   invertDrag();
+  viewer.controls.zoom = true;
+  viewer.controls.pinch = true;
+  document.getElementsByClassName("display")[0].addEventListener("click", () => {
+    alert(viewer.controls.zoom + " " + viewer.controls.pinch);
+  });
 
   // Set up key handlers
   if (!mobile) { 
@@ -241,12 +234,10 @@ function viewerSetup(viewer) {
 
   // Makes a full rotation left in 12 steps
   function moveLeft() {
-    alert("left");
     viewer.controls.theta += PI2 / 12;
   }
   // Makes a full rotation right in 12 steps
   function moveRight() {
-    alert("right");
     viewer.controls.theta -= PI2 / 12;
   }
   // Makes a half rotation up in 15 steps

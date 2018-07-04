@@ -41,6 +41,22 @@ module.exports = [
         "id": "cordova-plugin-statusbar.StatusBarProxy",
         "pluginId": "cordova-plugin-statusbar",
         "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-gyroscope/www/Orientation.js",
+        "id": "cordova-plugin-gyroscope.Orientation",
+        "pluginId": "cordova-plugin-gyroscope",
+        "clobbers": [
+            "Orientation"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-gyroscope/www/gyroscope.js",
+        "id": "cordova-plugin-gyroscope.gyroscope",
+        "pluginId": "cordova-plugin-gyroscope",
+        "clobbers": [
+            "navigator.gyroscope"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -51,7 +67,8 @@ module.exports.metadata =
     "cordova-plugin-splashscreen": "5.0.2",
     "cordova-plugin-ionic-webview": "1.1.19",
     "cordova-plugin-ionic-keyboard": "2.0.5",
-    "cordova-plugin-statusbar": "2.4.2"
+    "cordova-plugin-statusbar": "2.4.2",
+    "cordova-plugin-gyroscope": "0.1.4"
 }
 // BOTTOM OF METADATA
 });

@@ -46,5 +46,13 @@
     },
     "is_top_level": true,
     "variables": {}
+  },
+  "cordova-plugin-gyroscope": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-gyroscope@^0.1.4"
+    },
+    "is_top_level": true,
+    "variables": {}
   }
 }
