@@ -183,11 +183,15 @@ window.onload = function () {
     // Load your image
     var image = new Image();
     image.onload = function () {
+        alert(":(");
+        console.log(":(");
         // Setup the 360 viewer
         var viewer = Object(__WEBPACK_IMPORTED_MODULE_2_360_image_viewer__["create360Viewer"])({
             image: image,
             canvas: canvas
         });
+        alert(":D");
+        console.log(":D");
         setupDragDrop(canvas, viewer);
         // Start canvas render loop
         viewer.start();
@@ -221,7 +225,6 @@ window.onload = function () {
             //   console.log("i've lost focus");
             // }
         });
-        image.src = "../../assets/imgs/pano.jpg";
         function setupDragDrop(canvas, viewer) {
             Object(__WEBPACK_IMPORTED_MODULE_3_drag_drop__["dragDrop"])(canvas, {
                 onDragEnter: function () {
@@ -244,7 +247,8 @@ window.onload = function () {
             });
         }
     };
-    alert('yes');
+    image.src = "../../assets/imgs/pano.jpg";
+    // image.onerror = function() {console.log("Image failed!");};
 };
 function check() {
     alert(mobile ? "mobile!" : "computer!");
@@ -294,9 +298,12 @@ function viewerSetup(viewer) {
         console.log(focus ? "gained focus" : "lost focus");
     });
     // Set up key handlers
-    document.body.onkeydown = checkKeyDown;
-    document.body.onkeyup = checkKeyUp;
-    document.addEventListener("mousemove", mouseHandler);
+    if (!mobile) {
+        document.body.onkeydown = checkKeyDown;
+        document.body.onkeyup = checkKeyUp;
+        document.addEventListener("mousemove", mouseHandler);
+    }
+    // Set up checkbox handlers
     document.getElementById("invert").addEventListener("change", invertDrag);
     document.getElementById("toggle").addEventListener("change", toggleSpin);
     // Set up button handlers
@@ -354,6 +361,7 @@ function viewerSetup(viewer) {
     }
     // Makes a full rotation right in 12 steps
     function moveRight() {
+        alert("right");
         viewer.controls.theta -= PI2 / 12;
     }
     // Makes a half rotation up in 15 steps

@@ -70,104 +70,22 @@ var initMouse = [0, 0]; // initial cursor position
 var currMouse = [0, 0]; // current cursor position
 var focus = true; // if the document has focus
 var HomePage = /** @class */ (function () {
-    // @ViewChild('left') myLeft : HTMLElement;
     function HomePage(navCtrl, platform) {
         this.navCtrl = navCtrl;
         this.platform = platform;
-        // alert("constructor");
         mobile = this.platform.is('mobileweb') ? true : false;
-        {
-            // this.myLeft.onclick = () => {
-            //   alert("left");
-            // }
-            // document.getElementById('left').onclick = () => {
-            //   alert("left");
-            // }
-            // const dropRegion = document.querySelector('#drop-region');
-            // // Get a canvas of some sort, e.g. fullscreen or embedded in a site
-            // const canvas = createCanvas({
-            //   canvas: document.querySelector('#canvas'),
-            //   // without this, the canvas defaults to full-screen
-            //   // viewport: [ 20, 20, 500, 256 ]
-            // });
-            // // Get the max image size possible
-            // // const imageUrl = getImageURL();
-            // // Load your image
-            // const image = new Image();
-            // image.src = "../../assets/imgs/pano.png";
-            // image.onload = () => {
-            //   // Setup the 360 viewer
-            //   const viewer = create360Viewer({
-            //     image: image,
-            //     canvas: canvas
-            //   });
-            //   setupDragDrop(canvas, viewer);
-            //   // Start canvas render loop
-            //   viewer.start();
-            //   viewerSetup(viewer);
-            //   viewer.on('tick', (dt) => {
-            //     var txt = "";
-            //     txt += viewer.controls.theta;
-            //     txt += " ";
-            //     txt += viewer.controls.phi;
-            //     document.getElementById("position").innerHTML = txt;
-            //     if (shift) {
-            //       // Handle cursor-guided scrolling
-            //       viewer.controls.theta += (initMouse[0] - currMouse[0]) * 0.000065;
-            //       viewer.controls.phi += (initMouse[1] - currMouse[1]) * 0.000035;
-            //     } else if (focus){
-            //         // Handle auto scrolling
-            //         if (autoSpin && !viewer.controls.dragging) {
-            //           dt = dt < 20 ? dt : 16.8;
-            //           viewer.controls.theta -= dt * 0.00005;
-            //           panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
-            //           panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
-            //           viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1);
-            //           // if (viewer.controls.phi >= 0.61 * Math.PI || viewer.controls.phi <= 0.479 * Math.PI) {
-            //           //   console.log("i'm not supposed be here: " + (viewer.controls.phi / Math.PI));
-            //           //   viewer.controls.phi = 0.57 * Math.PI;
-            //           // }
-            //         }
-            //       } 
-            //       // else {
-            //       //   console.log("i've lost focus");
-            //       // }
-            //   });
-            //   function setupDragDrop (canvas, viewer) {
-            //     dragDrop(canvas, {
-            //       onDragEnter: () => {
-            //         (<HTMLDivElement>dropRegion).style.display = '';
-            //       },
-            //       onDragLeave: () => {
-            //         (<HTMLDivElement>dropRegion).style.display = 'none';
-            //       },
-            //       onDrop: (files) => {
-            //         var img = new Image();
-            //         img.onload = () => {
-            //           viewer.texture(img);
-            //         };
-            //         img.onerror = () => {
-            //           alert('Could not load image!');
-            //         };
-            //         img.crossOrigin = 'Anonymous';
-            //         img.src = URL.createObjectURL(files[0]);
-            //       }
-            //     });
-            //   }
-            // };
-        }
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!-- <ion-header>\n  <ion-navbar>\n    <ion-title>\n      My 360 Viewer\n    </ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content padding>\n  <button ion-button id="#drop-region" (click)="check()">Check if mobile!</button>\n</ion-content> -->\n\n\n\n<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n  <style>\n  body {\n    margin: 0;\n    font-family: \'Source Sans Pro\', Helvetica, sans-serif;\n    overflow: hidden;\n  }\n  * {\n    -webkit-touch-callout:none;\n    -webkit-text-size-adjust:none;\n    -webkit-tap-highlight-color:rgba(0,0,0,0);\n    -webkit-user-select:none;\n  }\n  .display {\n    width: 100px;\n    height: 30px;\n    position: absolute;\n    top: 0;\n    left: 0;\n    margin: 20px;\n    display: block;\n    background: black;\n  }\n  .info {\n    position: absolute;\n    bottom: 0;\n    left: 0;\n    margin: 20px;\n    pointer-events: auto; /* Previously set to none */\n  }\n  .info2 {\n    position: absolute;\n    bottom: 0;\n    right: 0;\n    margin: 20px;\n    text-align: right;\n  }\n  .hr {\n    width: 20px;\n    height: 1px;\n    margin: 0;\n    padding: 0;\n    margin-bottom: 10px;\n    /* float: right; */\n    display: block;\n    background: white;\n    /* vertical-align: middle; */\n  }\n  p {\n    display: block;\n    margin: 0;\n    padding: 0;\n    /* vertical-align: middle; */\n    color: purple;\n    font-size: 10px;\n  }\n  canvas, .grab {\n    cursor: -webkit-grab;\n    cursor: -moz-grab;\n  }\n  canvas:active, .grabbing {\n    cursor: -webkit-grabbing;\n    cursor: -moz-grabbing; \n  }\n  .button{\n    width: 30px;\n    height: 30px;\n  }\n  .left {\n    position: absolute;\n    bottom: 50%;\n    left: 0;\n    margin: 20px;\n    pointer-events: auto; /* Previously set to none */\n  }\n  .right {\n    position: absolute;\n    bottom: 50%;\n    right: 0;\n    margin: 20px;\n    pointer-events: auto; /* Previously set to none */\n  }\n  #drop-region {\n    position: absolute;\n    top: 5px;\n    left: 5px;\n    width: calc(100% - 10px);\n    height: calc(100% - 10px);\n    pointer-events: none;\n    border: 2px dashed white;\n    box-sizing: border-box;\n    border-radius: 10px;\n    padding: 10px;\n    mix-blend-mode: overlay;\n    box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);\n  }\n  </style>\n</head>\n\n\n<body>\n  <canvas id="canvas"></canvas>\n  <div class="display">\n    <p id="position"></p>\n  </div>\n  <img class="left button" id="left" src="../../assets/imgs/left.png">\n  <img class="right button" id="right" src="../../assets/imgs/right.png">\n  <!-- <button class="right" id="right">Move right</button>\n  <button class="left" id="left">Move left</button> -->\n    \n    <div class="info">\n      <div class="hr"></div>\n      <p>Drop an equirectangular JPG or PNG here to view it in 360º</p>\n      <button id="spin">Spin!</button>\n      <p>Automatic scrolling <input type="checkbox" id="toggle"></p>\n      <p>Invert Drag Controls <input type="checkbox" id="invert"></p>\n    </div>\n    <div class="info2" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none;"></div>\n  <script src="bundle.js"></script>\n</body>\n</html>\n'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]) === "function" && _b || Object])
     ], HomePage);
     return HomePage;
+    var _a, _b;
 }());
 
 window.onload = function () {
-    // alert("onload");
     check();
     if (!mobile)
         document.getElementsByClassName("info2")[0].style.display = "";
@@ -175,6 +93,8 @@ window.onload = function () {
         alert("left");
     };
     var dropRegion = document.querySelector('#drop-region');
+    if (dropRegion)
+        console.log("dropregion didn't fail");
     // Get a canvas of some sort, e.g. fullscreen or embedded in a site
     var canvas = createCanvas({
         canvas: document.querySelector('#canvas'),
@@ -184,7 +104,7 @@ window.onload = function () {
     var image = new Image();
     image.onload = function () {
         // Setup the 360 viewer
-        var viewer = Object(__WEBPACK_IMPORTED_MODULE_2_360_image_viewer__["create360Viewer"])({
+        var viewer = __WEBPACK_IMPORTED_MODULE_2_360_image_viewer__({
             image: image,
             canvas: canvas
         });
@@ -211,19 +131,11 @@ window.onload = function () {
                     panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
                     panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
                     viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1);
-                    // if (viewer.controls.phi >= 0.61 * Math.PI || viewer.controls.phi <= 0.479 * Math.PI) {
-                    //   console.log("i'm not supposed be here: " + (viewer.controls.phi / Math.PI));
-                    //   viewer.controls.phi = 0.57 * Math.PI;
-                    // }
                 }
             }
-            // else {
-            //   console.log("i've lost focus");
-            // }
         });
-        image.src = "../../assets/imgs/pano.jpg";
         function setupDragDrop(canvas, viewer) {
-            Object(__WEBPACK_IMPORTED_MODULE_3_drag_drop__["dragDrop"])(canvas, {
+            __WEBPACK_IMPORTED_MODULE_3_drag_drop__(canvas, {
                 onDragEnter: function () {
                     dropRegion.style.display = '';
                 },
@@ -244,7 +156,7 @@ window.onload = function () {
             });
         }
     };
-    alert('yes');
+    image.src = "../../assets/imgs/pano.jpg";
 };
 function check() {
     alert(mobile ? "mobile!" : "computer!");
@@ -293,10 +205,15 @@ function viewerSetup(viewer) {
         focus = !focus;
         console.log(focus ? "gained focus" : "lost focus");
     });
+    // Personal Preference
+    invertDrag();
     // Set up key handlers
-    document.body.onkeydown = checkKeyDown;
-    document.body.onkeyup = checkKeyUp;
-    document.addEventListener("mousemove", mouseHandler);
+    if (!mobile) {
+        document.body.onkeydown = checkKeyDown;
+        document.body.onkeyup = checkKeyUp;
+        document.addEventListener("mousemove", mouseHandler);
+    }
+    // Set up checkbox handlers
     document.getElementById("invert").addEventListener("change", invertDrag);
     document.getElementById("toggle").addEventListener("change", toggleSpin);
     // Set up button handlers
@@ -354,6 +271,7 @@ function viewerSetup(viewer) {
     }
     // Makes a full rotation right in 12 steps
     function moveRight() {
+        alert("right");
         viewer.controls.theta -= PI2 / 12;
     }
     // Makes a half rotation up in 15 steps

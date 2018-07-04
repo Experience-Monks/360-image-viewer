@@ -2,9 +2,8 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { Platform } from 'ionic-angular';
 
-
-import { create360Viewer } from '360-image-viewer';
-import { dragDrop } from 'drag-drop';
+import * as create360Viewer from '360-image-viewer';
+import * as dragDrop from 'drag-drop';
 // import { canvasFit } from 'canvas-fit';
 // const create360Viewer = require('360-image-viewer');
 // const canvasFit = require('canvas-fit');
@@ -25,137 +24,44 @@ var focus = true;       // if the document has focus
 
 
 export class HomePage {
-  // @ViewChild('left') myLeft : HTMLElement;
-
   constructor(public navCtrl: NavController, public platform: Platform) {
-    // alert("constructor");
     mobile = this.platform.is('mobileweb') ? true : false;
-{    // check();
-    
-    // this.myLeft.onclick = () => {
-    //   alert("left");
-    // }
-    // document.getElementById('left').onclick = () => {
-    //   alert("left");
-    // }
-
-    // const dropRegion = document.querySelector('#drop-region');
-    // // Get a canvas of some sort, e.g. fullscreen or embedded in a site
-    // const canvas = createCanvas({
-    //   canvas: document.querySelector('#canvas'),
-    //   // without this, the canvas defaults to full-screen
-    //   // viewport: [ 20, 20, 500, 256 ]
-    // });
-
-    // // Get the max image size possible
-    // // const imageUrl = getImageURL();
-
-    // // Load your image
-    // const image = new Image();
-    // image.src = "../../assets/imgs/pano.png";
-    // image.onload = () => {
-    //   // Setup the 360 viewer
-    //   const viewer = create360Viewer({
-    //     image: image,
-    //     canvas: canvas
-    //   });
-
-    //   setupDragDrop(canvas, viewer);
-
-    //   // Start canvas render loop
-    //   viewer.start();
-
-    //   viewerSetup(viewer);
-
-    //   viewer.on('tick', (dt) => {
-    //     var txt = "";
-    //     txt += viewer.controls.theta;
-    //     txt += " ";
-    //     txt += viewer.controls.phi;
-    //     document.getElementById("position").innerHTML = txt;
-
-    //     if (shift) {
-    //       // Handle cursor-guided scrolling
-    //       viewer.controls.theta += (initMouse[0] - currMouse[0]) * 0.000065;
-    //       viewer.controls.phi += (initMouse[1] - currMouse[1]) * 0.000035;
-    //     } else if (focus){
-            
-    //         // Handle auto scrolling
-    //         if (autoSpin && !viewer.controls.dragging) {
-    //           dt = dt < 20 ? dt : 16.8;
-    //           viewer.controls.theta -= dt * 0.00005;
-    //           panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
-    //           panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
-    //           viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1);
-    //           // if (viewer.controls.phi >= 0.61 * Math.PI || viewer.controls.phi <= 0.479 * Math.PI) {
-    //           //   console.log("i'm not supposed be here: " + (viewer.controls.phi / Math.PI));
-    //           //   viewer.controls.phi = 0.57 * Math.PI;
-    //           // }
-    //         }
-    //       } 
-    //       // else {
-    //       //   console.log("i've lost focus");
-    //       // }
-    //   });
-
-    //   function setupDragDrop (canvas, viewer) {
-    //     dragDrop(canvas, {
-    //       onDragEnter: () => {
-    //         (<HTMLDivElement>dropRegion).style.display = '';
-    //       },
-    //       onDragLeave: () => {
-    //         (<HTMLDivElement>dropRegion).style.display = 'none';
-    //       },
-    //       onDrop: (files) => {
-    //         var img = new Image();
-    //         img.onload = () => {
-    //           viewer.texture(img);
-    //         };
-    //         img.onerror = () => {
-    //           alert('Could not load image!');
-    //         };
-    //         img.crossOrigin = 'Anonymous';
-    //         img.src = URL.createObjectURL(files[0]);
-    //       }
-    //     });
-    //   }
-    // };
-    }
   }
-  
-  
 }
 
 window.onload = () => {
-  // alert("onload");
   check();
   if (!mobile)
     (<HTMLElement>document.getElementsByClassName("info2")[0]).style.display = "";
+  
   document.getElementById('left').onclick = () => {
     alert("left");
   }
 
   const dropRegion = document.querySelector('#drop-region');
+  if (dropRegion)
+    console.log("dropregion didn't fail");
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
   const canvas = createCanvas({
     canvas: document.querySelector('#canvas'),
     // without this, the canvas defaults to full-screen
     // viewport: [ 20, 20, 500, 256 ]
   });
+  
 
   alert("hi");
   // Load your image
   const image = new Image();
 
+
   image.onload = () => {
     // Setup the 360 viewer
-    const viewer = create360Viewer({
-      image: image,
-      canvas: canvas
+    const viewer = create360Viewer({ 
+      image: image, 
+      canvas: canvas 
     });
 
     setupDragDrop(canvas, viewer);
-
     
     // Start canvas render loop
     viewer.start();
@@ -182,18 +88,11 @@ window.onload = () => {
             panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
             panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
             viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1);
-            // if (viewer.controls.phi >= 0.61 * Math.PI || viewer.controls.phi <= 0.479 * Math.PI) {
-            //   console.log("i'm not supposed be here: " + (viewer.controls.phi / Math.PI));
-            //   viewer.controls.phi = 0.57 * Math.PI;
-            // }
           }
         } 
-        // else {
-        //   console.log("i've lost focus");
-        // }
     });
 
-    image.src = "../../assets/imgs/pano.jpg";
+    
 
     function setupDragDrop (canvas, viewer) {
       dragDrop(canvas, {
@@ -218,7 +117,7 @@ window.onload = () => {
     }
   };
 
-  alert('yes')
+  image.src = "../../assets/imgs/pano.jpg";
 }
 
 
@@ -287,10 +186,17 @@ function viewerSetup(viewer) {
     console.log(focus ? "gained focus" : "lost focus");
   })
 
+  // Personal Preference
+  invertDrag();
+
   // Set up key handlers
-  document.body.onkeydown = checkKeyDown;
-  document.body.onkeyup = checkKeyUp;
-  document.addEventListener("mousemove", mouseHandler);
+  if (!mobile) { 
+    document.body.onkeydown = checkKeyDown;
+    document.body.onkeyup = checkKeyUp;
+    document.addEventListener("mousemove", mouseHandler);
+  }
+
+  // Set up checkbox handlers
   document.getElementById("invert").addEventListener("change", invertDrag);
   document.getElementById("toggle").addEventListener("change", toggleSpin);
 
@@ -340,6 +246,7 @@ function viewerSetup(viewer) {
   }
   // Makes a full rotation right in 12 steps
   function moveRight() {
+    alert("right");
     viewer.controls.theta -= PI2 / 12;
   }
   // Makes a half rotation up in 15 steps
