@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { Gyroscope, GyroscopeOrientation, GyroscopeOptions } from '@ionic-native/gyroscope';
 import { Platform } from 'ionic-angular';
 
 
@@ -14,7 +13,7 @@ var panUp = true;           // initial vertical scroll direction
 var shift = false;          // if the shift key is pressed
 var initMouse = [0, 0]      // initial cursor position
 var currMouse = [0, 0]      // current cursor position
-var currAcc = [0, 0, 0, 0] // current gyro position
+var currAcc = [0, 0, 0, 0] // current acceleration
 var canvasSize = [0, 0]     // current canvas size
 
 @Component({
@@ -24,10 +23,10 @@ var canvasSize = [0, 0]     // current canvas size
 
 
 export class HomePage {
-  constructor(public navCtrl: NavController, public platform: Platform, public gyroscope: Gyroscope) {
+  constructor(public navCtrl: NavController, public platform: Platform) {
     mobile = this.platform.is('mobileweb') ? true : false;
     if (mobile)
-      accSetup();
+      rotationSetup();
   }
 }
 
@@ -269,36 +268,23 @@ function viewerSetup(viewer) {
   }
 }
 
-function accSetup() {
-  alert("settin up");
-  window.addEventListener("devicemotion", readAcceleration)
+function rotationSetup() {
+  const digits = 4;
+  window.addEventListener("deviceorientation", (e) => {
+    let alpha = Math.trunc(e.alpha * Math.pow(10, digits)) / Math.pow(10, digits);
+    let beta = Math.trunc(e.beta * Math.pow(10, digits)) / Math.pow(10, digits);
+    let gamma = Math.trunc(e.gamma * Math.pow(10, digits)) / Math.pow(10, digits);
+    currAcc = [alpha, beta, gamma];
+    document.getElementById("position").innerHTML = "<p>" + [alpha, beta, gamma].join("</p><p>") + "</p>";
+  })
 }
-function readAcceleration(e) {
-  currAcc = [e.acceleration.x, e.acceleration.y, e.acceleration.z, 0]
-  let xAcc = "" + (Math.trunc(e.acceleration.x * 10000) / 10000);
-  let yAcc = "" + (Math.trunc(e.acceleration.y * 10000) / 10000);
-  let zAcc = "" + (Math.trunc(e.acceleration.z * 10000) / 10000);
-  document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
-}
-
-
-// function gyroSetup(gyro) {
-//   if (mobile) {
-//     alert("setting up gyro!");
-//     let options: GyroscopeOptions = {
-//       frequency: 1000
-//     };
-//     gyro.getCurrent(options)
-//       .then((orientation: GyroscopeOrientation) => {
-//         currGyro = [orientation.x, orientation.y, orientation.z, orientation.timestamp];
-//         // console.log(orientation.x, orientation.y, orientation.z, orientation.timestamp);
-//       })
-//      .catch()
-//     gyro.watch()
-//       .subscribe((orientation: GyroscopeOrientation) => {
-//         currGyro = [orientation.x, orientation.y, orientation.z, orientation.timestamp];
-//         // console.log(orientation.x, orientation.y, orientation.z, orientation.timestamp);
-//       });
-//     alert("finished setting up (y)");
-//   }
+// function accSetup() {
+//   const digits = 4;
+//   window.addEventListener("devicemotion", (e) => {
+//     let xAcc = Math.trunc(e.acceleration.x * Math.pow(10, digits)) / Math.pow(10, digits);
+//     let yAcc = Math.trunc(e.acceleration.y * Math.pow(10, digits)) / Math.pow(10, digits);
+//     let zAcc = Math.trunc(e.acceleration.z * Math.pow(10, digits)) / Math.pow(10, digits);
+//     currAcc = [xAcc, yAcc, zAcc];
+//     document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
+//   })
 // }
