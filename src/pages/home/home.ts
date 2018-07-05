@@ -9,12 +9,13 @@ import * as dragDrop from 'drag-drop';
 
 var mobile = false;
 
-var autoSpin = false;     // whether to always rotate the view
-var panUp = true;         // initial vertical scroll direction
-var shift = false;        // if the shift key is pressed
-var initMouse = [0, 0]    // initial cursor position
-var currMouse = [0, 0]    // current cursor position
-var focus = true;       // if the document has focus
+var autoSpin = false;       // whether to rotate the view
+var panUp = true;           // initial vertical scroll direction
+var shift = false;          // if the shift key is pressed
+var initMouse = [0, 0]      // initial cursor position
+var currMouse = [0, 0]      // current cursor position
+var currAcc = [0, 0, 0, 0] // current gyro position
+var canvasSize = [0, 0]     // current canvas size
 
 @Component({
   selector: 'page-home',
@@ -23,24 +24,12 @@ var focus = true;       // if the document has focus
 
 
 export class HomePage {
-  constructor(public navCtrl: NavController, public platform: Platform, private gyroscope: Gyroscope) {
+  constructor(public navCtrl: NavController, public platform: Platform, public gyroscope: Gyroscope) {
     mobile = this.platform.is('mobileweb') ? true : false;
-    if (mobile) {
-      let options: GyroscopeOptions = {
-        frequency: 1000
-      };
-      
-      this.gyroscope.getCurrent(options)
-       .then((orientation: GyroscopeOrientation) => {
-          console.log(orientation.x, orientation.y, orientation.z, orientation.timestamp);
-        })
-       .catch()
-    }
+    if (mobile)
+      accSetup();
   }
 }
-
-
-
 
 window.onload = () => {
   alert(mobile ? "mobile!" : "computer!");
@@ -76,21 +65,26 @@ window.onload = () => {
 
     viewerSetup(viewer);
 
+    const xFactor = 0.000065;
+    const yFactor = 0.000065;
+
     viewer.on('tick', (dt) => {
       var txt = "";
       txt += viewer.controls.theta;
       txt += " ";
       txt += viewer.controls.phi;
-      document.getElementById("position").innerHTML = txt;
+      // document.getElementById("position").innerHTML = txt;
 
       if (shift) {
         // Handle cursor-guided scrolling
-        viewer.controls.theta += (initMouse[0] - currMouse[0]) * 0.000065;
-        viewer.controls.phi += (initMouse[1] - currMouse[1]) * 0.000035;
-      } else if (focus){
-          
+        var xdiff = initMouse[0] - currMouse[0];
+        var ydiff = initMouse[1] - currMouse[1];
+        viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 2);
+        viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 2);
+      } else if (true){
           // Handle auto scrolling
           if (autoSpin && !viewer.controls.dragging) {
+            // Makes sure dt doesn't become too high
             dt = dt < 20 ? dt : 16.8;
             viewer.controls.theta -= dt * 0.00005;
             panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
@@ -148,6 +142,8 @@ function createCanvas (opt = <any>{}) {
     canvas.height = height * dpr;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
+
+    canvasSize = [width, height];
   };
 
   // Ensure the grab cursor appears even when the mouse is outside the window
@@ -168,19 +164,13 @@ function createCanvas (opt = <any>{}) {
 }
 
 function viewerSetup(viewer) {
-  // Determine when document has focus
-  document.addEventListener("visibilitychange", function() {
-    focus = !focus;
-    console.log(focus ? "gained focus" : "lost focus");
-  })
-
   // Personal Preference
   invertDrag();
-  viewer.controls.zoom = true;
-  viewer.controls.pinch = true;
-  document.getElementsByClassName("display")[0].addEventListener("click", () => {
-    alert(viewer.controls.zoom + " " + viewer.controls.pinch);
-  });
+  if (mobile) {
+    document.getElementsByClassName("display")[0].addEventListener("click", () => {
+      alert(currAcc.join("\n"));
+    });
+  }
 
   // Set up key handlers
   if (!mobile) { 
@@ -269,8 +259,8 @@ function viewerSetup(viewer) {
   }
   // Constantly caching the mouse's position
   function mouseHandler(event) {
-    var x = event.clientX;
-    var y = event.clientY;
+    let x = event.clientX;
+    let y = event.clientY;
     currMouse = [x, y];
   }
   // Inverts the controls for dragging
@@ -278,3 +268,37 @@ function viewerSetup(viewer) {
     viewer.controls.rotateSpeed = -viewer.controls.rotateSpeed;
   }
 }
+
+function accSetup() {
+  alert("settin up");
+  window.addEventListener("devicemotion", readAcceleration)
+}
+function readAcceleration(e) {
+  currAcc = [e.acceleration.x, e.acceleration.y, e.acceleration.z, 0]
+  let xAcc = "" + (Math.trunc(e.acceleration.x * 10000) / 10000);
+  let yAcc = "" + (Math.trunc(e.acceleration.y * 10000) / 10000);
+  let zAcc = "" + (Math.trunc(e.acceleration.z * 10000) / 10000);
+  document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
+}
+
+
+// function gyroSetup(gyro) {
+//   if (mobile) {
+//     alert("setting up gyro!");
+//     let options: GyroscopeOptions = {
+//       frequency: 1000
+//     };
+//     gyro.getCurrent(options)
+//       .then((orientation: GyroscopeOrientation) => {
+//         currGyro = [orientation.x, orientation.y, orientation.z, orientation.timestamp];
+//         // console.log(orientation.x, orientation.y, orientation.z, orientation.timestamp);
+//       })
+//      .catch()
+//     gyro.watch()
+//       .subscribe((orientation: GyroscopeOrientation) => {
+//         currGyro = [orientation.x, orientation.y, orientation.z, orientation.timestamp];
+//         // console.log(orientation.x, orientation.y, orientation.z, orientation.timestamp);
+//       });
+//     alert("finished setting up (y)");
+//   }
+// }

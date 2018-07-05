@@ -47,10 +47,18 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-gyroscope": {
+  "cordova-plugin-device-gyroscope": {
     "source": {
       "type": "registry",
-      "id": "cordova-plugin-gyroscope@^0.1.4"
+      "id": "cordova-plugin-device-gyroscope@0.2.2"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-device-motion": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-device-motion"
     },
     "is_top_level": true,
     "variables": {}

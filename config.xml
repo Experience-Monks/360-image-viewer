@@ -83,5 +83,6 @@
     <engine name="browser" spec="5.0.3" />
     <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
     <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
-    <plugin name="cordova-plugin-gyroscope" spec="^0.1.4" />
+    <plugin name="cordova-plugin-device-gyroscope" spec="^0.2.2" />
+    <plugin name="cordova-plugin-device-motion" spec="^2.0.1" />
 </widget>

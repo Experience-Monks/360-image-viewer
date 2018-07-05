@@ -43,20 +43,42 @@ module.exports = [
         "runs": true
     },
     {
-        "file": "plugins/cordova-plugin-gyroscope/www/Orientation.js",
-        "id": "cordova-plugin-gyroscope.Orientation",
-        "pluginId": "cordova-plugin-gyroscope",
+        "file": "plugins/cordova-plugin-device-gyroscope/www/orientation.js",
+        "id": "cordova-plugin-device-gyroscope.orientation",
+        "pluginId": "cordova-plugin-device-gyroscope",
         "clobbers": [
-            "Orientation"
+            "orientation"
         ]
     },
     {
-        "file": "plugins/cordova-plugin-gyroscope/www/gyroscope.js",
-        "id": "cordova-plugin-gyroscope.gyroscope",
-        "pluginId": "cordova-plugin-gyroscope",
+        "file": "plugins/cordova-plugin-device-gyroscope/www/gyroscope.js",
+        "id": "cordova-plugin-device-gyroscope.gyroscope",
+        "pluginId": "cordova-plugin-device-gyroscope",
         "clobbers": [
             "navigator.gyroscope"
         ]
+    },
+    {
+        "file": "plugins/cordova-plugin-device-motion/www/Acceleration.js",
+        "id": "cordova-plugin-device-motion.Acceleration",
+        "pluginId": "cordova-plugin-device-motion",
+        "clobbers": [
+            "Acceleration"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-device-motion/www/accelerometer.js",
+        "id": "cordova-plugin-device-motion.accelerometer",
+        "pluginId": "cordova-plugin-device-motion",
+        "clobbers": [
+            "navigator.accelerometer"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-device-motion/src/browser/AccelerometerProxy.js",
+        "id": "cordova-plugin-device-motion.AccelerometerProxy",
+        "pluginId": "cordova-plugin-device-motion",
+        "runs": true
     }
 ];
 module.exports.metadata = 
@@ -68,7 +90,8 @@ module.exports.metadata =
     "cordova-plugin-ionic-webview": "1.1.19",
     "cordova-plugin-ionic-keyboard": "2.0.5",
     "cordova-plugin-statusbar": "2.4.2",
-    "cordova-plugin-gyroscope": "0.1.4"
+    "cordova-plugin-device-gyroscope": "0.2.0",
+    "cordova-plugin-device-motion": "2.0.1"
 }
 // BOTTOM OF METADATA
 });

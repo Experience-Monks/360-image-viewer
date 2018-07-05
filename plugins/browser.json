@@ -25,7 +25,10 @@
     "cordova-plugin-statusbar": {
       "PACKAGE_NAME": "io.ionic.starter"
     },
-    "cordova-plugin-gyroscope": {
+    "cordova-plugin-device-gyroscope": {
+      "PACKAGE_NAME": "io.ionic.starter"
+    },
+    "cordova-plugin-device-motion": {
       "PACKAGE_NAME": "io.ionic.starter"
     }
   },
