@@ -6,14 +6,20 @@ import { Platform } from 'ionic-angular';
 import * as create360Viewer from '360-image-viewer';
 import * as dragDrop from 'drag-drop';
 
+const decimalDigits = 3;
+
 var mobile = false;
 
 var autoSpin = false;       // whether to rotate the view
 var panUp = true;           // initial vertical scroll direction
 var shift = false;          // if the shift key is pressed
+var tilt = false;           // if mobile is in tilt mode
 var initMouse = [0, 0]      // initial cursor position
 var currMouse = [0, 0]      // current cursor position
-var currAcc = [0, 0, 0, 0] // current acceleration
+// var currAcc = [0, 0, 0, 0]  // current acceleration
+var initRot = [0, 0, 0]     // current rotation
+var currRot = [0, 60, 0]     // current rotation
+var currPos = [0, 0]        // current position
 var canvasSize = [0, 0]     // current canvas size
 
 @Component({
@@ -25,17 +31,30 @@ var canvasSize = [0, 0]     // current canvas size
 export class HomePage {
   constructor(public navCtrl: NavController, public platform: Platform) {
     mobile = this.platform.is('mobileweb') ? true : false;
-    if (mobile)
-      rotationSetup();
+    // if (mobile)
+    //   rotationSetup();
   }
 }
 
 window.onload = () => {
   alert(mobile ? "mobile!" : "computer!");
-  if (!mobile)
+  if (!mobile) {
+    document.getElementById("tilt").style.display = "none";
     (<HTMLElement>document.getElementsByClassName("info2")[0]).style.display = "";
+  }
+  else {
+    document.getElementById("spin").style.display = "none";
+    document.getElementsByClassName("display")[0].addEventListener("click", () => {
+      alert(initRot.join("\n"));
+    });
+  }
+
+  // if (mobile) {
+    
+  // }
   
   const dropRegion = document.querySelector('#drop-region');
+ 
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
   const canvas = createCanvas({
     canvas: document.querySelector('#canvas'),
@@ -64,36 +83,52 @@ window.onload = () => {
 
     viewerSetup(viewer);
 
-    const xFactor = 0.000065;
-    const yFactor = 0.000065;
+    let xFactor = 0.000065;
+    let yFactor = 0.000050;
 
     viewer.on('tick', (dt) => {
-      var txt = "";
-      txt += viewer.controls.theta;
-      txt += " ";
-      txt += viewer.controls.phi;
-      // document.getElementById("position").innerHTML = txt;
+      // To be deleted
+      if (!mobile) {
+        let theta =  Math.trunc(viewer.controls.theta * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+        let phi = Math.trunc(viewer.controls.phi * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+        currPos = [theta, phi];
+        document.getElementById("position").innerHTML = "<p>" + currPos.join("</p><p>") + "</p>";
+      };
 
-      if (shift) {
-        // Handle cursor-guided scrolling
-        var xdiff = initMouse[0] - currMouse[0];
-        var ydiff = initMouse[1] - currMouse[1];
-        viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 2);
-        viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 2);
-      } else if (true){
-          // Handle auto scrolling
-          if (autoSpin && !viewer.controls.dragging) {
-            // Makes sure dt doesn't become too high
-            dt = dt < 20 ? dt : 16.8;
-            viewer.controls.theta -= dt * 0.00005;
-            panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
-            panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
-            viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1);
-          }
-        } 
+      if (shift && !mobile) {
+        cursorScrolling();
+      } else if (tilt && mobile) {
+          tiltScrolling();
+      } else if (autoSpin && !viewer.controls.dragging) {
+          autoSpinning(dt);
+      } 
     });
 
-    
+    // Handle gyroscope-guided scrolling
+    function tiltScrolling() {
+      let xdiff = initRot[2] - currRot[2]; // z axis
+      let ydiff = initRot[1] - currRot[1]; // y axis
+      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 2);
+      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 2);
+    }
+
+    // Handle cursor-guided scrolling
+    function cursorScrolling() {
+      let xdiff = initMouse[0] - currMouse[0];
+      let ydiff = initMouse[1] - currMouse[1];
+      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 2);
+      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 2);
+    }
+
+    // Handle automatic scrolling
+    function autoSpinning(dt) {
+      dt = dt < 20 ? dt : 16.8;   // Makes sure dt doesn't become too high
+      viewer.controls.theta -= dt * 0.00005; // Sideways movement
+      // Determine when to switch vertical direction
+      panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
+      panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
+      viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1); // Vertical movement
+    }
 
     function setupDragDrop (canvas, viewer) {
       dragDrop(canvas, {
@@ -165,11 +200,6 @@ function createCanvas (opt = <any>{}) {
 function viewerSetup(viewer) {
   // Personal Preference
   invertDrag();
-  if (mobile) {
-    document.getElementsByClassName("display")[0].addEventListener("click", () => {
-      alert(currAcc.join("\n"));
-    });
-  }
 
   // Set up key handlers
   if (!mobile) { 
@@ -183,7 +213,11 @@ function viewerSetup(viewer) {
   document.getElementById("toggle").addEventListener("change", toggleSpin);
 
   // Set up button handlers
-  document.getElementById("spin").addEventListener("click", toggleSpinKeyDown);
+  if (!mobile)
+    document.getElementById("spin").addEventListener("click", toggleSpinKeyDown);
+    else
+    document.getElementById("tilt").addEventListener("click", toggleTilt);
+
   document.getElementById("left").addEventListener("click", moveLeft);
   document.getElementById("right").addEventListener("click", moveRight);
 
@@ -268,22 +302,28 @@ function viewerSetup(viewer) {
   }
 }
 
-function rotationSetup() {
-  const digits = 4;
-  window.addEventListener("deviceorientation", (e) => {
-    let alpha = Math.trunc(e.alpha * Math.pow(10, digits)) / Math.pow(10, digits);
-    let beta = Math.trunc(e.beta * Math.pow(10, digits)) / Math.pow(10, digits);
-    let gamma = Math.trunc(e.gamma * Math.pow(10, digits)) / Math.pow(10, digits);
-    currAcc = [alpha, beta, gamma];
-    document.getElementById("position").innerHTML = "<p>" + [alpha, beta, gamma].join("</p><p>") + "</p>";
-  })
+function toggleTilt() {
+  tilt = !tilt;
+  window.removeEventListener("deviceorientation", rotationSetup);
+  tilt ? window.addEventListener("deviceorientation", rotationSetup) 
+       : window.removeEventListener("deviceorientation", rotationSetup);
+  if (tilt)
+    initRot = currRot;
 }
+
+function rotationSetup(e) {
+  let alpha = Math.trunc(e.alpha * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+  let beta = Math.trunc(e.beta * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+  let gamma = Math.trunc(e.gamma * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+  currRot = [alpha, beta, gamma];
+  document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
+}
+
 // function accSetup() {
-//   const digits = 4;
 //   window.addEventListener("devicemotion", (e) => {
-//     let xAcc = Math.trunc(e.acceleration.x * Math.pow(10, digits)) / Math.pow(10, digits);
-//     let yAcc = Math.trunc(e.acceleration.y * Math.pow(10, digits)) / Math.pow(10, digits);
-//     let zAcc = Math.trunc(e.acceleration.z * Math.pow(10, digits)) / Math.pow(10, digits);
+//     let xAcc = Math.trunc(e.acceleration.x * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+//     let yAcc = Math.trunc(e.acceleration.y * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+//     let zAcc = Math.trunc(e.acceleration.z * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
 //     currAcc = [xAcc, yAcc, zAcc];
 //     document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
 //   })
