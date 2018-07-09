@@ -61,13 +61,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 var decimalDigits = 3;
 var mobile = false; // if being run on a phone
+var portrait = true; // orientation of phone
 var autoSpin = false; // whether to rotate the view
 var panUp = true; // initial vertical scroll direction
 var shift = false; // if the shift key is pressed
 var tilt = false; // if mobile is in tilt mode
 var initMouse = [0, 0]; // initial cursor position
 var currMouse = [0, 0]; // current cursor position
-// var currAcc = [0, 0, 0, 0]  // current acceleration
+var currAcc = [0, 0, 0, 0]; // current acceleration
 var initRot = [0, 0, 0]; // current rotation
 var currRot = [0, 0, 0]; // current rotation
 var rotSpeed = [0, 0, 0]; // movement in each axis (To be deleted)
@@ -78,8 +79,12 @@ var HomePage = /** @class */ (function () {
         this.navCtrl = navCtrl;
         this.platform = platform;
         mobile = this.platform.is('mobileweb') ? true : false;
-        // if (mobile)
-        //   rotationSetup();
+        if (mobile) {
+            alert(portrait = this.platform.isPortrait());
+            // alert(portrait)
+        }
+        if (mobile)
+            accSetup();
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
@@ -156,8 +161,8 @@ window.onload = function () {
         });
         // Handle gyroscope-guided scrolling
         function tiltScrolling() {
-            var xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
-            var ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 180), decimalDigits); // y axis
+            var ydiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
+            var xdiff = -roundDecimal(smallestDiff(initRot[1], currRot[1], 180), decimalDigits); // y axis
             rotSpeed = [0, ydiff, xdiff];
             viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 4);
             viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 4);
@@ -231,7 +236,8 @@ function createCanvas(opt) {
         canvas.style.width = width + "px";
         canvas.style.height = height + "px";
         canvasSize = [width, height];
-        // Insert 
+        if (mobile)
+            recalculateOrientation();
     };
     // Ensure the grab cursor appears even when the mouse is outside the window
     var setupGrabCursor = function () {
@@ -247,6 +253,23 @@ function createCanvas(opt) {
     resizeCanvas();
     setupGrabCursor();
     return canvas;
+}
+function recalculateOrientation() {
+    portrait = canvasSize[1] > canvasSize[0];
+    portrait ? (currAcc[1] > 0 ? alert("vertical")
+        : alert("upside down"))
+        : (currAcc[0] > 0 ? alert("counterclockwise")
+            : alert("clockwise"));
+    // if (portrait)
+    //   if (currAcc[1] > 0)
+    //     alert("vertical")
+    //   else 
+    //     alert("upside down")
+    // else 
+    //   if (currAcc[0] > 0)
+    //     alert("counterclockwise")
+    //   else 
+    //     alert("clockwise")
 }
 function viewerSetup(viewer) {
     // Personal Preference
@@ -367,7 +390,6 @@ function toggleTilt() {
     }
 }
 function rotationSetup(e) {
-    // rounding off the decimals to [decimalDigits] places each
     var alpha = roundDecimal(e.alpha, decimalDigits);
     var beta = roundDecimal(e.beta, decimalDigits);
     var gamma = roundDecimal(e.gamma, decimalDigits);
@@ -377,15 +399,15 @@ function rotationSetup(e) {
 function roundDecimal(num, dig) {
     return Math.trunc(num * Math.pow(10, dig)) / Math.pow(10, dig);
 }
-// function accSetup() {
-//   window.addEventListener("devicemotion", (e) => {
-//     let xAcc = Math.trunc(e.acceleration.x * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-//     let yAcc = Math.trunc(e.acceleration.y * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-//     let zAcc = Math.trunc(e.acceleration.z * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-//     currAcc = [xAcc, yAcc, zAcc];
-//     document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
-//   })
-// }
+function accSetup() {
+    window.addEventListener("devicemotion", function (e) {
+        var xAcc = Math.trunc(e.acceleration.x * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+        var yAcc = Math.trunc(e.acceleration.y * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+        var zAcc = Math.trunc(e.acceleration.z * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+        currAcc = [xAcc, yAcc, zAcc];
+        // document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
+    });
+}
 //# sourceMappingURL=home.js.map
 
 /***/ }),
