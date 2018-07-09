@@ -27,6 +27,16 @@
     display: block;
     background: black;
   }
+  .display2 {
+    width: 50px;
+    height: 80px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 20px;
+    display: block;
+    background: black;
+  }
   .info {
     position: absolute;
     bottom: 0;
@@ -109,6 +119,9 @@
   <div class="display">
     <p id="position"></p>
   </div>
+  <div class="display2">
+    <p id="position2"></p>
+  </div>
   <img class="left button" id="left" src="../../assets/imgs/left.png">
   <img class="right button" id="right" src="../../assets/imgs/right.png">
   <!-- <button class="right" id="right">Move right</button>
@@ -117,8 +130,8 @@
     <div class="info">
       <div class="hr"></div>
       <p>Drop an equirectangular JPG or PNG here to view it in 360º</p>
-      <button id="spin">Spin!</button>
-      <button id="tilt">Tilt!</button>
+      <button id="spin">Spin</button>
+      <button id="tilt">Tilt</button>
       <p>Automatic scrolling <input type="checkbox" id="toggle"></p>
       <p>Invert Drag Controls <input type="checkbox" id="invert"></p>
     </div>

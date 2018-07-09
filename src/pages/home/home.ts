@@ -8,7 +8,7 @@ import * as dragDrop from 'drag-drop';
 
 const decimalDigits = 3;
 
-var mobile = false;
+var mobile = false;         // if being run on a phone
 
 var autoSpin = false;       // whether to rotate the view
 var panUp = true;           // initial vertical scroll direction
@@ -18,7 +18,8 @@ var initMouse = [0, 0]      // initial cursor position
 var currMouse = [0, 0]      // current cursor position
 // var currAcc = [0, 0, 0, 0]  // current acceleration
 var initRot = [0, 0, 0]     // current rotation
-var currRot = [0, 60, 0]     // current rotation
+var currRot = [0, 0, 0]     // current rotation
+var rotSpeed = [0, 0, 0]    // movement in each axis (To be deleted)
 var currPos = [0, 0]        // current position
 var canvasSize = [0, 0]     // current canvas size
 
@@ -37,22 +38,34 @@ export class HomePage {
 }
 
 window.onload = () => {
+  // To be deleted
   alert(mobile ? "mobile!" : "computer!");
+
+  var xFactor;
+  var yFactor;
+
+  // HTML changes
   if (!mobile) {
     document.getElementById("tilt").style.display = "none";
     (<HTMLElement>document.getElementsByClassName("info2")[0]).style.display = "";
+    
+    xFactor = 0.000065;
+    yFactor = 0.000050;
   }
   else {
     document.getElementById("spin").style.display = "none";
+    // To be deleted
     document.getElementsByClassName("display")[0].addEventListener("click", () => {
       alert(initRot.join("\n"));
     });
+
+    xFactor = 0.00105;
+    yFactor = 0.00125;
   }
 
-  // if (mobile) {
-    
-  // }
-  
+  window.addEventListener("deviceorientation", rotationSetup);
+
+  // Setup canvas and drop region
   const dropRegion = document.querySelector('#drop-region');
  
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
@@ -76,15 +89,13 @@ window.onload = () => {
       distanceBounds: [0, 1.05],
     });
 
-    setupDragDrop(canvas, viewer);
+    if (!mobile)
+      setupDragDrop(canvas, viewer);
     
     // Start canvas render loop
     viewer.start();
 
     viewerSetup(viewer);
-
-    let xFactor = 0.000065;
-    let yFactor = 0.000050;
 
     viewer.on('tick', (dt) => {
       // To be deleted
@@ -93,11 +104,11 @@ window.onload = () => {
         let phi = Math.trunc(viewer.controls.phi * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
         currPos = [theta, phi];
         document.getElementById("position").innerHTML = "<p>" + currPos.join("</p><p>") + "</p>";
-      };
+      }
 
       if (shift && !mobile) {
         cursorScrolling();
-      } else if (tilt && mobile) {
+      } else if (tilt && mobile && !viewer.controls.dragging) {
           tiltScrolling();
       } else if (autoSpin && !viewer.controls.dragging) {
           autoSpinning(dt);
@@ -106,10 +117,21 @@ window.onload = () => {
 
     // Handle gyroscope-guided scrolling
     function tiltScrolling() {
-      let xdiff = initRot[2] - currRot[2]; // z axis
-      let ydiff = initRot[1] - currRot[1]; // y axis
-      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 2);
-      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 2);
+      let xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
+      let ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 180), decimalDigits); // y axis
+      rotSpeed = [0, ydiff, xdiff];
+      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 4);
+      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 4);
+      document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
+    }
+
+    function smallestDiff(init, curr, degrees) {
+      let diff = (init - curr) % degrees;
+      let sign = Math.sign(diff);
+      let absDiff = Math.abs(diff);
+      // Take the smaller part of the total degrees
+      diff = absDiff > (degrees / 2) ? degrees - absDiff : absDiff;
+      return sign * diff;
     }
 
     // Handle cursor-guided scrolling
@@ -178,6 +200,7 @@ function createCanvas (opt = <any>{}) {
     canvas.style.height = `${height}px`;
 
     canvasSize = [width, height];
+    // Insert 
   };
 
   // Ensure the grab cursor appears even when the mouse is outside the window
@@ -213,11 +236,8 @@ function viewerSetup(viewer) {
   document.getElementById("toggle").addEventListener("change", toggleSpin);
 
   // Set up button handlers
-  if (!mobile)
-    document.getElementById("spin").addEventListener("click", toggleSpinKeyDown);
-    else
-    document.getElementById("tilt").addEventListener("click", toggleTilt);
-
+  mobile ? document.getElementById("tilt").addEventListener("click", toggleTilt)
+         : document.getElementById("spin").addEventListener("click", toggleSpinKeyDown)
   document.getElementById("left").addEventListener("click", moveLeft);
   document.getElementById("right").addEventListener("click", moveRight);
 
@@ -307,16 +327,24 @@ function toggleTilt() {
   window.removeEventListener("deviceorientation", rotationSetup);
   tilt ? window.addEventListener("deviceorientation", rotationSetup) 
        : window.removeEventListener("deviceorientation", rotationSetup);
-  if (tilt)
+  tilt ? document.getElementById("tilt").innerHTML = "Stop"
+       : document.getElementById("tilt").innerHTML = "Tilt"
+  if (tilt) {
     initRot = currRot;
+  }
 }
 
 function rotationSetup(e) {
-  let alpha = Math.trunc(e.alpha * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-  let beta = Math.trunc(e.beta * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-  let gamma = Math.trunc(e.gamma * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+  // rounding off the decimals to [decimalDigits] places each
+  let alpha = roundDecimal(e.alpha, decimalDigits);
+  let beta = roundDecimal(e.beta, decimalDigits);
+  let gamma = roundDecimal(e.gamma, decimalDigits);
   currRot = [alpha, beta, gamma];
   document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
+}
+
+function roundDecimal(num, dig) {
+  return Math.trunc(num * Math.pow(10, dig)) / Math.pow(10, dig);
 }
 
 // function accSetup() {
