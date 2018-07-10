@@ -68,26 +68,20 @@ var tilt = false; // if mobile is in tilt mode
 var portrait = 0; // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
 var initMouse = [0, 0]; // initial cursor position
 var currMouse = [0, 0]; // current cursor position
-var currAcc = [0, 0, 0, 0]; // current acceleration
+var currAcc = [0, 0, 0]; // current acceleration
 var initRot = [0, 0, 0]; // current rotation
 var currRot = [0, 0, 0]; // current rotation
 var rotSpeed = [0, 0, 0]; // movement in each axis (To be deleted)
 var currPos = [0, 0]; // current position
 var canvasSize = [0, 0]; // current canvas size
-var scalingFactors = [0.000065, 0.00005];
+var scalingFactors; // holds scaling factors
 // var xFactor;
 // var yFactor;
 var HomePage = /** @class */ (function () {
     function HomePage(navCtrl, platform) {
         this.navCtrl = navCtrl;
         this.platform = platform;
-        mobile = this.platform.is('mobileweb') ? true : false;
-        if (mobile) {
-            // alert(portrait = this.platform.isPortrait());
-            // alert(portrait)
-        }
-        if (mobile)
-            accSetup();
+        mobile = this.platform.is('mobileweb');
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
@@ -100,27 +94,24 @@ var HomePage = /** @class */ (function () {
 }());
 
 window.onload = function () {
-    // To be deleted
-    alert(mobile ? "mobile!" : "computer!");
-    // HTML changes
+    // Desktop setup
     if (!mobile) {
         document.getElementById("tilt").style.display = "none";
+        mouseSetup();
+        // To be deleted
         document.getElementsByClassName("info2")[0].style.display = "";
-        scalingFactors[0] = 0.000065;
-        scalingFactors[1] = 0.000050;
+        scalingFactors = [0.000065, 0.000050];
     }
     else {
         document.getElementById("spin").style.display = "none";
+        rotSetup();
+        accSetup();
         // To be deleted
         document.getElementsByClassName("display")[0].addEventListener("click", function () {
             alert(initRot.join("\n"));
         });
-        scalingFactors[0] = 0.000065;
-        scalingFactors[1] = 0.000050;
-        // scalingFactors[0] = 0.000105;
-        // scalingFactors[1] = 0.000125;
+        scalingFactors = [0.00003, 0.00003];
     }
-    window.addEventListener("deviceorientation", rotationSetup);
     // Setup canvas and drop region
     var dropRegion = document.querySelector('#drop-region');
     // Get a canvas of some sort, e.g. fullscreen or embedded in a site
@@ -134,7 +125,7 @@ window.onload = function () {
         var viewer = __WEBPACK_IMPORTED_MODULE_2_360_image_viewer__({
             image: image,
             canvas: canvas,
-            damping: 0.2,
+            damping: 0.25,
             zoom: true,
             pinching: true,
             distanceBounds: [0, 1.05],
@@ -142,13 +133,13 @@ window.onload = function () {
         if (!mobile)
             setupDragDrop(canvas, viewer);
         // Start canvas render loop
-        viewer.start();
         viewerSetup(viewer);
+        viewer.start();
         viewer.on('tick', function (dt) {
             // To be deleted
             if (!mobile) {
-                var theta = Math.trunc(viewer.controls.theta * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-                var phi = Math.trunc(viewer.controls.phi * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+                var theta = roundDecimal(viewer.controls.theta, decimalDigits);
+                var phi = roundDecimal(viewer.controls.phi, decimalDigits);
                 currPos = [theta, phi];
                 document.getElementById("position").innerHTML = "<p>" + currPos.join("</p><p>") + "</p>";
             }
@@ -162,46 +153,14 @@ window.onload = function () {
                 autoSpinning(dt);
             }
         });
-        // Handle gyroscope-guided scrolling
-        function tiltScrolling() {
-            var xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
-            var ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 90), decimalDigits); // y axis
-            // swap if horizontal
-            if (portrait % 2 != 0) {
-                var temp = xdiff;
-                xdiff = ydiff;
-                ydiff = temp;
-            }
-            // Negate values as necessary
-            if (portrait == 3) {
-                ydiff = -ydiff;
-            }
-            else if (portrait == 2) {
-                xdiff = -xdiff;
-                ydiff = -ydiff;
-            }
-            else if (portrait == 1) {
-                xdiff = -xdiff;
-            }
-            rotSpeed = [0, ydiff, xdiff];
-            viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0]; // (canvasSize[0] / 4);
-            viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1]; // (canvasSize[1] / 4);
-            document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
-        }
-        // returns the smallest angle difference between init and curr within the range [-deg, deg]
-        function smallestDiff(init, curr, deg) {
-            var deg2 = 2 * deg;
-            var diff = (init % deg - curr % deg + deg2) % deg2;
-            return diff > deg ? diff - deg2 : diff;
-            // if (diff > degrees) 
-            // 	diff = diff - (2 * degrees)
-            // return diff
-            // let diff = (init % degrees - curr % degrees) % (2 * degrees);
-            // let sign = Math.sign(diff);
-            // let absDiff = Math.abs(diff);
-            // // Take the smaller part of the total degrees
-            // diff = absDiff > degrees ? (2 * degrees) - absDiff : absDiff;
-            // return sign * diff;
+        // Handle automatic scrolling
+        function autoSpinning(dt) {
+            dt = dt < 20 ? dt : 16.8; // Makes sure dt doesn't become too high
+            viewer.controls.theta -= dt * 0.00005; // Horizontal movement
+            // Determine when to switch vertical direction
+            panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
+            panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
+            viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1); // Vertical movement
         }
         // Handle cursor-guided scrolling
         function cursorScrolling() {
@@ -210,15 +169,45 @@ window.onload = function () {
             viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0] / (canvasSize[0] / 2);
             viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1] / (canvasSize[1] / 2);
         }
-        // Handle automatic scrolling
-        function autoSpinning(dt) {
-            dt = dt < 20 ? dt : 16.8; // Makes sure dt doesn't become too high
-            viewer.controls.theta -= dt * 0.00005; // Sideways movement
-            // Determine when to switch vertical direction
-            panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
-            panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
-            viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1); // Vertical movement
+        // Handle gyroscope-guided scrolling
+        function tiltScrolling() {
+            var xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
+            var ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 90), decimalDigits); // y axis
+            // swap if landscape orientation
+            if (portrait % 2 != 0) {
+                var temp = xdiff;
+                xdiff = ydiff;
+                ydiff = temp;
+            }
+            // Negate values as necessary
+            if (portrait != 0) {
+                if (portrait > 1)
+                    ydiff = -ydiff;
+                if (portrait < 3)
+                    xdiff = -xdiff;
+            }
+            // // Negate values as necessary
+            // if (portrait == 3) {
+            //   ydiff = -ydiff;
+            // } else if (portrait == 2) {
+            //   xdiff = -xdiff;
+            //   ydiff = -ydiff;
+            // } else if (portrait == 1) {
+            //   xdiff = -xdiff;
+            // }
+            rotSpeed = [0, ydiff, xdiff];
+            viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0]; // (canvasSize[0] / 4);
+            viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1]; // (canvasSize[1] / 4);
+            // To be deleted
+            document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
         }
+        // returns the smallest angle difference between init and curr within the range [-deg, deg]
+        function smallestDiff(init, curr, deg) {
+            var deg2 = 2 * deg;
+            var diff = (init % deg - curr % deg + deg2) % deg2;
+            return diff > deg ? diff - deg2 : diff;
+        }
+        // Setup drag and drop for uploading new photos on desktop
         function setupDragDrop(canvas, viewer) {
             __WEBPACK_IMPORTED_MODULE_3_drag_drop__(canvas, {
                 onDragEnter: function () {
@@ -278,32 +267,16 @@ function createCanvas(opt) {
     };
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-    setupGrabCursor();
+    if (!mobile)
+        setupGrabCursor();
     return canvas;
 }
 function recalculateOrientation() {
-    // If taller than wide, vertical
-    // 0-vertical, 1-cw, 2-upside down, 3-ccw
-    alert(currAcc[0]);
+    // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
     portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] > 0 ? 0 : 2)
         : (currAcc[0] > 0 ? 3 : 1);
-    if (portrait % 2 == 0 && scalingFactors[0] > scalingFactors[1] ||
-        portrait % 2 != 0 && scalingFactors[0] < scalingFactors[1]) {
-        var temp = scalingFactors[0];
-        scalingFactors[0] = scalingFactors[1];
-        scalingFactors[1] = temp;
-    }
-    alert(portrait);
-    // if (portrait)
-    //   if (currAcc[1] > 0)
-    //     alert("vertical")
-    //   else 
-    //     alert("upside down")
-    // else 
-    //   if (currAcc[0] > 0)
-    //     alert("counterclockwise")
-    //   else 
-    //     alert("clockwise")
+    if (tilt)
+        toggleTilt();
 }
 function viewerSetup(viewer) {
     // Personal Preference
@@ -312,23 +285,22 @@ function viewerSetup(viewer) {
     if (!mobile) {
         document.body.onkeydown = checkKeyDown;
         document.body.onkeyup = checkKeyUp;
-        document.addEventListener("mousemove", mouseHandler);
     }
     // Set up checkbox handlers
-    document.getElementById("invert").addEventListener("change", invertDrag);
-    document.getElementById("toggle").addEventListener("change", toggleSpin);
+    document.getElementById("invert").onchange = invertDrag;
+    document.getElementById("toggle").onchange = toggleSpin;
     // Set up button handlers
-    mobile ? document.getElementById("tilt").addEventListener("click", toggleTilt)
-        : document.getElementById("spin").addEventListener("click", toggleSpinKeyDown);
-    document.getElementById("left").addEventListener("click", moveLeft);
-    document.getElementById("right").addEventListener("click", moveRight);
+    mobile ? document.getElementById("tilt").onclick = toggleTilt
+        : document.getElementById("spin").onclick = toggleSpinKeyDown;
+    document.getElementById("left").onclick = moveLeft;
+    document.getElementById("right").onclick = moveRight;
     // Calls helper methods based on which keys pressed
     function checkKeyDown(e) {
         e = e || window.event;
         switch (e.keyCode) {
             // shift
             case 16:
-                shiftDown();
+                shiftOn();
                 break;
             // space
             case 32:
@@ -358,7 +330,7 @@ function viewerSetup(viewer) {
         switch (e.keyCode) {
             // shift
             case 16:
-                shiftUp();
+                shiftOff();
                 break;
         }
     }
@@ -382,65 +354,74 @@ function viewerSetup(viewer) {
     function moveDown() {
         viewer.controls.phi -= Math.PI / 15;
     }
-    // Toggles auto spin on key down
-    function toggleSpinKeyDown() {
-        document.getElementById("toggle").checked =
-            !document.getElementById("toggle").checked;
-        toggleSpin();
-    }
-    // Toggles auto spin
-    function toggleSpin() {
-        autoSpin = !autoSpin;
-    }
-    // Triggers when shift is held down
-    function shiftDown() {
-        shift = true;
-        initMouse = currMouse;
-    }
-    // Triggers when shift is released
-    function shiftUp() {
-        shift = false;
-    }
-    // Constantly caching the mouse's position
-    function mouseHandler(event) {
-        var x = event.clientX;
-        var y = event.clientY;
-        currMouse = [x, y];
-    }
     // Inverts the controls for dragging
     function invertDrag() {
         viewer.controls.rotateSpeed = -viewer.controls.rotateSpeed;
     }
 }
+// Activates shift controls
+function shiftOn() {
+    shift = true;
+    initMouse = currMouse;
+}
+// Deactivates shift controls
+function shiftOff() {
+    shift = false;
+}
+// Toggles auto spin triggered by a keypress
+function toggleSpinKeyDown() {
+    document.getElementById("toggle").checked =
+        !document.getElementById("toggle").checked;
+    toggleSpin();
+}
+// Toggles auto spin
+function toggleSpin() {
+    autoSpin = !autoSpin;
+}
+// Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
     tilt = !tilt;
-    window.removeEventListener("deviceorientation", rotationSetup);
-    tilt ? window.addEventListener("deviceorientation", rotationSetup)
-        : window.removeEventListener("deviceorientation", rotationSetup);
     tilt ? document.getElementById("tilt").innerHTML = "Stop"
         : document.getElementById("tilt").innerHTML = "Tilt";
-    if (tilt) {
+    if (tilt)
         initRot = currRot;
-    }
 }
-function rotationSetup(e) {
-    var alpha = roundDecimal(e.alpha, decimalDigits);
-    var beta = roundDecimal(e.beta, decimalDigits);
-    var gamma = roundDecimal(e.gamma, decimalDigits);
-    currRot = [alpha, beta, gamma];
-    document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
+// Read and cache mouse position
+// Used for shift controls on desktop
+function mouseSetup() {
+    document.addEventListener("mousemove", function (e) {
+        var x = e.clientX;
+        var y = e.clientY;
+        currMouse = [x, y];
+    });
 }
-function roundDecimal(num, dig) {
-    return Math.trunc(num * Math.pow(10, dig)) / Math.pow(10, dig);
+// Read and cache the rotation values
+// Used for tilt controls on mobile
+function rotSetup() {
+    window.addEventListener("deviceorientation", function (e) {
+        var alpha = roundDecimal(e.alpha, decimalDigits);
+        var beta = roundDecimal(e.beta, decimalDigits);
+        var gamma = roundDecimal(e.gamma, decimalDigits);
+        currRot = [alpha, beta, gamma];
+        // To be deleted
+        document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
+    });
 }
+// Read and cache the acceleration values
+// Used for detecting orientation on mobile
 function accSetup() {
     window.addEventListener("devicemotion", function (e) {
-        var xAcc = Math.trunc(e.accelerationIncludingGravity.x * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-        var yAcc = Math.trunc(e.accelerationIncludingGravity.y * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-        var zAcc = Math.trunc(e.accelerationIncludingGravity.z * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+        var xAcc = roundDecimal(e.accelerationIncludingGravity.x, decimalDigits);
+        var yAcc = roundDecimal(e.accelerationIncludingGravity.y, decimalDigits);
+        var zAcc = roundDecimal(e.accelerationIncludingGravity.z, decimalDigits);
         currAcc = [xAcc, yAcc, zAcc];
+        // To be deleted
         // document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
     });
+}
+// Rounds num to at most dig decimal places
+function roundDecimal(num, dig) {
+    return Math.trunc(num * Math.pow(10, dig)) / Math.pow(10, dig);
 }
 //# sourceMappingURL=home.js.map
 
