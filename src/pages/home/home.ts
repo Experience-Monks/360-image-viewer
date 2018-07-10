@@ -23,6 +23,9 @@ var currRot = [0, 0, 0]     // current rotation
 var rotSpeed = [0, 0, 0]    // movement in each axis (To be deleted)
 var currPos = [0, 0]        // current position
 var canvasSize = [0, 0]     // current canvas size
+var scalingFactors = [0.000065, 0.00005]
+// var xFactor;
+// var yFactor;
 
 @Component({
   selector: 'page-home',
@@ -46,16 +49,15 @@ window.onload = () => {
   // To be deleted
   alert(mobile ? "mobile!" : "computer!");
 
-  var xFactor;
-  var yFactor;
+  
 
   // HTML changes
   if (!mobile) {
     document.getElementById("tilt").style.display = "none";
     (<HTMLElement>document.getElementsByClassName("info2")[0]).style.display = "";
     
-    xFactor = 0.000065;
-    yFactor = 0.000050;
+    scalingFactors[0] = 0.000065;
+    scalingFactors[1] = 0.000050;
   }
   else {
     document.getElementById("spin").style.display = "none";
@@ -64,8 +66,10 @@ window.onload = () => {
       alert(initRot.join("\n"));
     });
 
-    xFactor = 0.00105;
-    yFactor = 0.00125;
+    scalingFactors[0] = 0.000065;
+    scalingFactors[1] = 0.000050;
+    // scalingFactors[0] = 0.000105;
+    // scalingFactors[1] = 0.000125;
   }
 
   window.addEventListener("deviceorientation", rotationSetup);
@@ -122,8 +126,8 @@ window.onload = () => {
 
     // Handle gyroscope-guided scrolling
     function tiltScrolling() {
-      let xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 180), decimalDigits); // z axis
-      let ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 360), decimalDigits); // y axis
+      let xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
+      let ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 90), decimalDigits); // y axis
       // swap if horizontal
       if (portrait % 2 != 0) {
         let temp = xdiff;
@@ -141,26 +145,34 @@ window.onload = () => {
       }
       
       rotSpeed = [0, ydiff, xdiff];
-      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 4);
-      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 4);
+      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0] // (canvasSize[0] / 4);
+      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1] // (canvasSize[1] / 4);
       document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
     }
 
-    function smallestDiff(init, curr, degrees) {
-      let diff = (init - curr) % degrees;
-      let sign = Math.sign(diff);
-      let absDiff = Math.abs(diff);
-      // Take the smaller part of the total degrees
-      diff = absDiff > (degrees / 2) ? degrees - absDiff : absDiff;
-      return sign * diff;
+    // returns the smallest angle difference between init and curr within the range [-deg, deg]
+    function smallestDiff(init, curr, deg) {
+      let deg2 = 2 * deg;
+      let diff = (init % deg - curr % deg + deg2) % deg2;
+      return diff > deg ? diff - deg2 : diff;
+      // if (diff > degrees) 
+      // 	diff = diff - (2 * degrees)
+      // return diff
+      
+      // let diff = (init % degrees - curr % degrees) % (2 * degrees);
+      // let sign = Math.sign(diff);
+      // let absDiff = Math.abs(diff);
+      // // Take the smaller part of the total degrees
+      // diff = absDiff > degrees ? (2 * degrees) - absDiff : absDiff;
+      // return sign * diff;
     }
 
     // Handle cursor-guided scrolling
     function cursorScrolling() {
       let xdiff = initMouse[0] - currMouse[0];
       let ydiff = initMouse[1] - currMouse[1];
-      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 2);
-      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 2);
+      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0] / (canvasSize[0] / 2);
+      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1] / (canvasSize[1] / 2);
     }
 
     // Handle automatic scrolling
@@ -248,6 +260,12 @@ function recalculateOrientation() {
   alert(currAcc[0])
   portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] > 0 ? 0 : 2)
                                            : (currAcc[0] > 0 ? 3 : 1);
+  if (portrait % 2 == 0 && scalingFactors[0] > scalingFactors[1] ||
+      portrait % 2 != 0 && scalingFactors[0] < scalingFactors[1]) { 
+    let temp = scalingFactors[0];
+    scalingFactors[0] = scalingFactors[1];
+    scalingFactors[1] = temp;
+  }
   alert(portrait);
   // if (portrait)
   //   if (currAcc[1] > 0)
@@ -380,7 +398,7 @@ function rotationSetup(e) {
   let beta = roundDecimal(e.beta, decimalDigits);
   let gamma = roundDecimal(e.gamma, decimalDigits);
   currRot = [alpha, beta, gamma];
-  // document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
+  document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
 }
 
 function roundDecimal(num, dig) {
@@ -393,6 +411,6 @@ function accSetup() {
     let yAcc = Math.trunc(e.accelerationIncludingGravity.y * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
     let zAcc = Math.trunc(e.accelerationIncludingGravity.z * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
     currAcc = [xAcc, yAcc, zAcc];
-    document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
+    // document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
   })
 }
