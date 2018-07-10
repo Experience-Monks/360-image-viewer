@@ -9,12 +9,12 @@ import * as dragDrop from 'drag-drop';
 const decimalDigits = 3;
 
 var mobile = false;         // if being run on a phone
-var portrait = true;        // orientation of phone
 var autoSpin = false;       // whether to rotate the view
 var panUp = true;           // initial vertical scroll direction
 var shift = false;          // if the shift key is pressed
 var tilt = false;           // if mobile is in tilt mode
 
+var portrait = 0;           // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
 var initMouse = [0, 0]      // initial cursor position
 var currMouse = [0, 0]      // current cursor position
 var currAcc = [0, 0, 0, 0]  // current acceleration
@@ -34,7 +34,7 @@ export class HomePage {
   constructor(public navCtrl: NavController, public platform: Platform) {
     mobile = this.platform.is('mobileweb') ? true : false;
     if (mobile) {
-      alert(portrait = this.platform.isPortrait());
+      // alert(portrait = this.platform.isPortrait());
       // alert(portrait)
     }
     if (mobile)
@@ -122,8 +122,24 @@ window.onload = () => {
 
     // Handle gyroscope-guided scrolling
     function tiltScrolling() {
-      let ydiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
-      let xdiff = -roundDecimal(smallestDiff(initRot[1], currRot[1], 180), decimalDigits); // y axis
+      let xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 180), decimalDigits); // z axis
+      let ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 360), decimalDigits); // y axis
+      // swap if horizontal
+      if (portrait % 2 != 0) {
+        let temp = xdiff;
+        xdiff = ydiff;
+        ydiff = temp;
+      } 
+      // Negate values as necessary
+      if (portrait == 3) {
+        ydiff = -ydiff;
+      } else if (portrait == 2) {
+        xdiff = -xdiff;
+        ydiff = -ydiff;
+      } else if (portrait == 1) {
+        xdiff = -xdiff;
+      }
+      
       rotSpeed = [0, ydiff, xdiff];
       viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * xFactor / (canvasSize[0] / 4);
       viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * yFactor / (canvasSize[1] / 4);
@@ -227,11 +243,12 @@ function createCanvas (opt = <any>{}) {
 }
 
 function recalculateOrientation() {
-  portrait = canvasSize[1] > canvasSize[0];
-  portrait ? (currAcc[1] > 0 ? alert("vertical") 
-                             : alert("upside down")) 
-           : (currAcc[0] > 0 ? alert("counterclockwise")
-                             : alert("clockwise"));
+  // If taller than wide, vertical
+  // 0-vertical, 1-cw, 2-upside down, 3-ccw
+  alert(currAcc[0])
+  portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] > 0 ? 0 : 2)
+                                           : (currAcc[0] > 0 ? 3 : 1);
+  alert(portrait);
   // if (portrait)
   //   if (currAcc[1] > 0)
   //     alert("vertical")
@@ -363,7 +380,7 @@ function rotationSetup(e) {
   let beta = roundDecimal(e.beta, decimalDigits);
   let gamma = roundDecimal(e.gamma, decimalDigits);
   currRot = [alpha, beta, gamma];
-  document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
+  // document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
 }
 
 function roundDecimal(num, dig) {
@@ -372,10 +389,10 @@ function roundDecimal(num, dig) {
 
 function accSetup() {
   window.addEventListener("devicemotion", (e) => {
-    let xAcc = Math.trunc(e.acceleration.x * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-    let yAcc = Math.trunc(e.acceleration.y * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
-    let zAcc = Math.trunc(e.acceleration.z * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+    let xAcc = Math.trunc(e.accelerationIncludingGravity.x * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+    let yAcc = Math.trunc(e.accelerationIncludingGravity.y * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
+    let zAcc = Math.trunc(e.accelerationIncludingGravity.z * Math.pow(10, decimalDigits)) / Math.pow(10, decimalDigits);
     currAcc = [xAcc, yAcc, zAcc];
-    // document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
+    document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
   })
 }
