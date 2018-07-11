@@ -386,14 +386,14 @@ function toggleSpin() {
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
     tilt = !tilt;
-    tilt ? document.getElementById("tilt").innerHTML = "Stop"
-        : document.getElementById("tilt").innerHTML = "Tilt";
     if (tilt) {
+        document.getElementById("tilt").innerHTML = "Stop";
         initRot = currRot;
-        document.getElementById("tilt").addEventListener('click', enableNoSleep);
     }
     else {
+        document.getElementById("tilt").innerHTML = "Tilt";
         awake.disable();
+        document.getElementById("tilt").addEventListener('click', enableNoSleep);
     }
 }
 // Read and cache mouse position
