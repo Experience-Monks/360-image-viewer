@@ -2,16 +2,16 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { Platform } from 'ionic-angular';
 
-
 import * as create360Viewer from '360-image-viewer';
 import * as dragDrop from 'drag-drop';
+import * as noSleep from 'nosleep.js';
 
 const decimalDigits = 3;
 
 var mobile = false;         // if being run on a phone
 var autoSpin = false;       // whether to rotate the view
-var panUp = true;           // initial vertical scroll direction
-var shift = false;          // if the shift key is pressed
+var panUp = true;           // initial vertical spin direction
+var shift = false;          // if the shift key is held
 var tilt = false;           // if mobile is in tilt mode
 
 var portrait = 0;           // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
@@ -24,8 +24,8 @@ var rotSpeed = [0, 0, 0]    // movement in each axis (To be deleted)
 var currPos = [0, 0]        // current position
 var canvasSize = [0, 0]     // current canvas size
 var scalingFactors;         // holds scaling factors
-// var xFactor;
-// var yFactor;
+
+var awake = new noSleep();
 
 @Component({
   selector: 'page-home',
@@ -38,9 +38,11 @@ export class HomePage {
     mobile = this.platform.is('mobileweb');
   }
 }
-
 window.onload = () => {
-  // Desktop setup
+  
+  
+  
+    // Desktop setup
   if (!mobile) {
     document.getElementById("spin").style.display = "";
     mouseSetup();
@@ -54,20 +56,19 @@ window.onload = () => {
     // Set up tilt controls if supported
     if ("ondeviceorientation" in window) {
       document.getElementById("tilt").style.display = "";
+      document.getElementById("tilt").addEventListener("click", enableNoSleep);
       rotSetup();
       accSetup();
+
+      scalingFactors = [0.00003, 0.00003];
     }
-    
+
     // To be deleted
     document.getElementsByClassName("display")[0].addEventListener("click", () => {
       alert(initRot.join("\n"));
     });
 
-    scalingFactors = [0.00003, 0.00003];
   }
-
-  // Setup canvas and drop region
-  const dropRegion = document.querySelector('#drop-region');
  
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
   const canvas = createCanvas({
@@ -135,35 +136,26 @@ window.onload = () => {
     function tiltScrolling() {
       let xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
       let ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 90), decimalDigits); // y axis
+      
       // swap if landscape orientation
       if (portrait % 2 != 0) {
         let temp = xdiff;
         xdiff = ydiff;
         ydiff = temp;
       } 
-
       // Negate values as necessary
+      // 0: x=x, y=y, 1: x=-y, y=x, 2: x=-x, y=-y, 3: x=y, y=-x
       if (portrait != 0) {
         if (portrait > 1)
           ydiff = -ydiff;
         if (portrait < 3)
           xdiff = -xdiff;
       }
-
-      // // Negate values as necessary
-      // if (portrait == 3) {
-      //   ydiff = -ydiff;
-      // } else if (portrait == 2) {
-      //   xdiff = -xdiff;
-      //   ydiff = -ydiff;
-      // } else if (portrait == 1) {
-      //   xdiff = -xdiff;
-      // }
       
-      rotSpeed = [0, ydiff, xdiff];
       viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0] // (canvasSize[0] / 4);
       viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1] // (canvasSize[1] / 4);
       // To be deleted
+      rotSpeed = [0, ydiff, xdiff];
       document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
     }
 
@@ -176,6 +168,7 @@ window.onload = () => {
 
     // Setup drag and drop for uploading new photos on desktop
     function setupDragDrop (canvas, viewer) {
+      const dropRegion = document.querySelector('#drop-region');
       dragDrop(canvas, {
         onDragEnter: () => {
           (<HTMLDivElement>dropRegion).style.display = '';
@@ -245,6 +238,14 @@ function createCanvas (opt = <any>{}) {
   return canvas;
 }
 
+// Prevents the screen from going to sleep on mobile
+function enableNoSleep() {
+  awake.enable();
+  alert("no more sleeping")
+  document.getElementById("tilt").removeEventListener('click', enableNoSleep);
+}
+
+// Calculates the orientation of the mobile device
 function recalculateOrientation() {
   // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
   portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] >= 0 ? 0 : 2)
@@ -253,6 +254,7 @@ function recalculateOrientation() {
     toggleTilt();
 }
 
+// Set up controls for the viewer
 function viewerSetup(viewer) {
   // Personal Preference
   invertDrag();
@@ -358,8 +360,12 @@ function toggleTilt() {
   tilt = !tilt;
   tilt ? document.getElementById("tilt").innerHTML = "Stop"
        : document.getElementById("tilt").innerHTML = "Tilt"
-  if (tilt)
+  if (tilt) {
     initRot = currRot;
+    document.getElementById("tilt").addEventListener('click', enableNoSleep);
+  } else {
+    awake.disable();
+  }
 }
 
 // Read and cache mouse position

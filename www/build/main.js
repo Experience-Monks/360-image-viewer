@@ -45,6 +45,8 @@ webpackEmptyAsyncContext.id = 161;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_360_image_viewer___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_360_image_viewer__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_drag_drop__ = __webpack_require__(330);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_drag_drop___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_drag_drop__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_nosleep_js__ = __webpack_require__(333);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_nosleep_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_nosleep_js__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -59,11 +61,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var decimalDigits = 3;
 var mobile = false; // if being run on a phone
 var autoSpin = false; // whether to rotate the view
-var panUp = true; // initial vertical scroll direction
-var shift = false; // if the shift key is pressed
+var panUp = true; // initial vertical spin direction
+var shift = false; // if the shift key is held
 var tilt = false; // if mobile is in tilt mode
 var portrait = 0; // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
 var initMouse = [0, 0]; // initial cursor position
@@ -75,8 +78,7 @@ var rotSpeed = [0, 0, 0]; // movement in each axis (To be deleted)
 var currPos = [0, 0]; // current position
 var canvasSize = [0, 0]; // current canvas size
 var scalingFactors; // holds scaling factors
-// var xFactor;
-// var yFactor;
+var awake = new __WEBPACK_IMPORTED_MODULE_4_nosleep_js__();
 var HomePage = /** @class */ (function () {
     function HomePage(navCtrl, platform) {
         this.navCtrl = navCtrl;
@@ -87,9 +89,10 @@ var HomePage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n  <style>\n  body {\n    margin: 0;\n    font-family: \'Source Sans Pro\', Helvetica, sans-serif;\n    overflow: hidden;\n  }\n  * {\n    -webkit-touch-callout:none;\n    -webkit-text-size-adjust:none;\n    -webkit-tap-highlight-color:rgba(0,0,0,0);\n    -webkit-user-select:none;\n  }\n  .display {\n    width: 50px;\n    height: 80px;\n    position: absolute;\n    top: 0;\n    left: 0;\n    margin: 20px;\n    display: block;\n    background: black;\n  }\n  .display2 {\n    width: 50px;\n    height: 80px;\n    position: absolute;\n    top: 0;\n    right: 0;\n    margin: 20px;\n    display: block;\n    background: black;\n  }\n  .info {\n    position: absolute;\n    width: 115px;\n    bottom: 0;\n    left: 0;\n    margin: 20px;\n    padding: 5px;\n    pointer-events: auto; /* Previously set to none */\n    background-color: rgba(0, 0, 0, 0.5)\n  }\n  .info2 {\n    position: absolute;\n    bottom: 0;\n    right: 0;\n    margin: 20px;\n    text-align: right;\n  }\n  .hr {\n    width: 20px;\n    height: 1px;\n    margin: 0;\n    padding: 0;\n    margin-top: 10px;\n    margin-bottom: 10px;\n    /* float: right; */\n    display: block;\n    background: white;\n    /* vertical-align: middle; */\n  }\n  p {\n    display: block;\n    margin: 0;\n    padding: 0;\n    /* vertical-align: middle; */\n    color: white;\n    font-size: 10px;\n  }\n  canvas, .grab {\n    cursor: -webkit-grab;\n    cursor: -moz-grab;\n  }\n  canvas:active, .grabbing {\n    cursor: -webkit-grabbing;\n    cursor: -moz-grabbing; \n  }\n  .button{\n    width: 30px;\n    height: 30px;\n    position: absolute;\n    bottom: 50%;\n    margin: 20px;\n    pointer-events: auto; /* Previously set to none */\n  }\n  .left {\n    left: 0;\n  }\n  .right {\n    right: 0;\n  }\n  #drop-region {\n    position: absolute;\n    top: 5px;\n    left: 5px;\n    width: calc(100% - 10px);\n    height: calc(100% - 10px);\n    pointer-events: none;\n    border: 2px dashed white;\n    box-sizing: border-box;\n    border-radius: 10px;\n    padding: 10px;\n    mix-blend-mode: overlay;\n    box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);\n  }\n  #spin, #tilt {\n    float: right;\n  }\n  input[type="checkbox"] {\n    float: right\n  }\n  .controls{\n    margin-top: 5px;\n  }\n  </style>\n</head>\n\n\n<body>\n  <canvas id="canvas"></canvas>\n  <div class="display">\n    <p id="position"></p>\n  </div>\n  <div class="display2">\n    <p id="position2"></p>\n  </div>\n  <img class="left button" id="left" src="../../assets/imgs/left.png">\n  <img class="right button" id="right" src="../../assets/imgs/right.png">\n  <!-- <button class="right" id="right">Move right</button>\n  <button class="left" id="left">Move left</button> -->\n    \n    <div class="info">\n      <div class="hr"></div>\n      <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n      <button id="upload">Upload</button>\n      <button id="spin" style="display: none">Spin</button>\n      <button id="tilt" style="display: none">Tilt</button>\n      <div class="hr"></div>\n      <p class="controls">Automatic scrolling <input type="checkbox" id="toggle"></p>\n      <p class="controls">Invert Drag Controls <input type="checkbox" id="invert"></p>\n    </div>\n    <div class="info2" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n</html>\n'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]) === "function" && _b || Object])
     ], HomePage);
     return HomePage;
+    var _a, _b;
 }());
 
 window.onload = function () {
@@ -105,17 +108,16 @@ window.onload = function () {
         // Set up tilt controls if supported
         if ("ondeviceorientation" in window) {
             document.getElementById("tilt").style.display = "";
+            document.getElementById("tilt").addEventListener("click", enableNoSleep);
             rotSetup();
             accSetup();
+            scalingFactors = [0.00003, 0.00003];
         }
         // To be deleted
         document.getElementsByClassName("display")[0].addEventListener("click", function () {
             alert(initRot.join("\n"));
         });
-        scalingFactors = [0.00003, 0.00003];
     }
-    // Setup canvas and drop region
-    var dropRegion = document.querySelector('#drop-region');
     // Get a canvas of some sort, e.g. fullscreen or embedded in a site
     var canvas = createCanvas({
         canvas: document.querySelector('#canvas'),
@@ -182,25 +184,17 @@ window.onload = function () {
                 ydiff = temp;
             }
             // Negate values as necessary
+            // 0: x=x, y=y, 1: x=-y, y=x, 2: x=-x, y=-y, 3: x=y, y=-x
             if (portrait != 0) {
                 if (portrait > 1)
                     ydiff = -ydiff;
                 if (portrait < 3)
                     xdiff = -xdiff;
             }
-            // // Negate values as necessary
-            // if (portrait == 3) {
-            //   ydiff = -ydiff;
-            // } else if (portrait == 2) {
-            //   xdiff = -xdiff;
-            //   ydiff = -ydiff;
-            // } else if (portrait == 1) {
-            //   xdiff = -xdiff;
-            // }
-            rotSpeed = [0, ydiff, xdiff];
             viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0]; // (canvasSize[0] / 4);
             viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1]; // (canvasSize[1] / 4);
             // To be deleted
+            rotSpeed = [0, ydiff, xdiff];
             document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
         }
         // returns the smallest angle difference between init and curr within the range [-deg, deg]
@@ -211,6 +205,7 @@ window.onload = function () {
         }
         // Setup drag and drop for uploading new photos on desktop
         function setupDragDrop(canvas, viewer) {
+            var dropRegion = document.querySelector('#drop-region');
             __WEBPACK_IMPORTED_MODULE_3_drag_drop__(canvas, {
                 onDragEnter: function () {
                     dropRegion.style.display = '';
@@ -273,6 +268,13 @@ function createCanvas(opt) {
         setupGrabCursor();
     return canvas;
 }
+// Prevents the screen from going to sleep on mobile
+function enableNoSleep() {
+    awake.enable();
+    alert("no more sleeping");
+    document.getElementById("tilt").removeEventListener('click', enableNoSleep);
+}
+// Calculates the orientation of the mobile device
 function recalculateOrientation() {
     // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
     portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] >= 0 ? 0 : 2)
@@ -280,6 +282,7 @@ function recalculateOrientation() {
     if (tilt)
         toggleTilt();
 }
+// Set up controls for the viewer
 function viewerSetup(viewer) {
     // Personal Preference
     invertDrag();
@@ -385,8 +388,13 @@ function toggleTilt() {
     tilt = !tilt;
     tilt ? document.getElementById("tilt").innerHTML = "Stop"
         : document.getElementById("tilt").innerHTML = "Tilt";
-    if (tilt)
+    if (tilt) {
         initRot = currRot;
+        document.getElementById("tilt").addEventListener('click', enableNoSleep);
+    }
+    else {
+        awake.disable();
+    }
 }
 // Read and cache mouse position
 // Used for shift controls on desktop
