@@ -85,20 +85,16 @@
   .button{
     width: 30px;
     height: 30px;
+    position: absolute;
+    bottom: 50%;
+    margin: 20px;
+    pointer-events: auto; /* Previously set to none */
   }
   .left {
-    position: absolute;
-    bottom: 50%;
     left: 0;
-    margin: 20px;
-    pointer-events: auto; /* Previously set to none */
   }
   .right {
-    position: absolute;
-    bottom: 50%;
     right: 0;
-    margin: 20px;
-    pointer-events: auto; /* Previously set to none */
   }
   #drop-region {
     position: absolute;
@@ -114,7 +110,7 @@
     mix-blend-mode: overlay;
     box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);
   }
-  #spin {
+  #spin, #tilt {
     float: right;
   }
   input[type="checkbox"] {
@@ -144,8 +140,8 @@
       <div class="hr"></div>
       <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->
       <button id="upload">Upload</button>
-      <button id="spin">Spin</button>
-      <button id="tilt">Tilt</button>
+      <button id="spin" style="display: none">Spin</button>
+      <button id="tilt" style="display: none">Tilt</button>
       <div class="hr"></div>
       <p class="controls">Automatic scrolling <input type="checkbox" id="toggle"></p>
       <p class="controls">Invert Drag Controls <input type="checkbox" id="invert"></p>
@@ -156,7 +152,7 @@
     <p>Use the ARROW KEYS to move around</p>
     <p>Hold SHIFT and move the cursor to pan around</p>
   </div>
-  <div id="drop-region" style="display: none;"></div>
+  <div id="drop-region" style="display: none"></div>
   <script src="bundle.js"></script>
 </body>
 </html>

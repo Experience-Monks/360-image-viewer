@@ -42,7 +42,7 @@ export class HomePage {
 window.onload = () => {
   // Desktop setup
   if (!mobile) {
-    document.getElementById("tilt").style.display = "none";
+    document.getElementById("spin").style.display = "";
     mouseSetup();
 
     // To be deleted
@@ -51,9 +51,12 @@ window.onload = () => {
   }
   // Mobile browser setup
   else {
-    document.getElementById("spin").style.display = "none";
-    rotSetup();
-    accSetup();
+    // Set up tilt controls if supported
+    if ("ondeviceorientation" in window) {
+      document.getElementById("tilt").style.display = "";
+      rotSetup();
+      accSetup();
+    }
     
     // To be deleted
     document.getElementsByClassName("display")[0].addEventListener("click", () => {
