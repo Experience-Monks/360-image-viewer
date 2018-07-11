@@ -39,10 +39,13 @@
   }
   .info {
     position: absolute;
+    width: 115px;
     bottom: 0;
     left: 0;
     margin: 20px;
+    padding: 5px;
     pointer-events: auto; /* Previously set to none */
+    background-color: rgba(0, 0, 0, 0.5)
   }
   .info2 {
     position: absolute;
@@ -56,6 +59,7 @@
     height: 1px;
     margin: 0;
     padding: 0;
+    margin-top: 10px;
     margin-bottom: 10px;
     /* float: right; */
     display: block;
@@ -110,6 +114,15 @@
     mix-blend-mode: overlay;
     box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);
   }
+  #spin {
+    float: right;
+  }
+  input[type="checkbox"] {
+    float: right
+  }
+  .controls{
+    margin-top: 5px;
+  }
   </style>
 </head>
 
@@ -129,11 +142,13 @@
     
     <div class="info">
       <div class="hr"></div>
-      <p>Drop an equirectangular JPG or PNG here to view it in 360º</p>
+      <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->
+      <button id="upload">Upload</button>
       <button id="spin">Spin</button>
       <button id="tilt">Tilt</button>
-      <p>Automatic scrolling <input type="checkbox" id="toggle"></p>
-      <p>Invert Drag Controls <input type="checkbox" id="invert"></p>
+      <div class="hr"></div>
+      <p class="controls">Automatic scrolling <input type="checkbox" id="toggle"></p>
+      <p class="controls">Invert Drag Controls <input type="checkbox" id="invert"></p>
     </div>
     <div class="info2" style="display: none">
     <div class="hr"></div>

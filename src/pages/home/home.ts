@@ -244,8 +244,8 @@ function createCanvas (opt = <any>{}) {
 
 function recalculateOrientation() {
   // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
-  portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] > 0 ? 0 : 2)
-                                           : (currAcc[0] > 0 ? 3 : 1);
+  portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] >= 0 ? 0 : 2)
+                                           : (currAcc[0] >= 0 ? 3 : 1);
   if (tilt)
     toggleTilt();
 }
