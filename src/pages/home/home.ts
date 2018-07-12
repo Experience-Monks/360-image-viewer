@@ -370,12 +370,15 @@ function toggleSpin() {
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
   tilt = !tilt;
-  let tiltButton = document.querySelector("#tilt")
+  // let tiltButton = document.querySelector("#tilt")
+  let tiltButton = <HTMLImageElement>document.querySelector("#tilt")
   if (tilt) {
-    tiltButton.innerHTML = "Stop"
+    tiltButton.src = "../../assets/imgs/iphone.png";
+    // tiltButton.innerHTML = "Stop"
     initRot = currRot;
   } else {
-    tiltButton.innerHTML = "Tilt"
+    tiltButton.src = "../../assets/imgs/tilt.png";
+    // tiltButton.innerHTML = "Tilt"
     awake.disable();
     tiltButton.addEventListener('click', enableNoSleep);
   }

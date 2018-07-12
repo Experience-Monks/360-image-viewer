@@ -88,12 +88,11 @@ var HomePage = /** @class */ (function () {
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n</head>\n\n<body>\n  <canvas id="canvas"></canvas>\n  <div class="left display">\n    <p id="position"></p>\n  </div>\n  <div class="right display">\n    <p id="position2"></p>\n  </div>\n  <img class="left arrow" id="left" src="../../assets/imgs/left.png">\n  <img class="right arrow" id="right" src="../../assets/imgs/right.png">\n  <div class="info">\n    <div class="hr"></div>\n    <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n    <label for="upload">\n      <img class="icon" src="../../assets/imgs/upload.png"> </label>\n    <input id="upload" type="file" style="display: none">\n    \n    <img class="icon" id="spin" src="../../assets/imgs/spin.png" style="display: none">\n    <button id="tilt" style="display: none">Tilt</button>\n    <div class="hr"></div>\n    <p class="controls">Automatic scrolling\n      <input type="checkbox" id="toggle">\n    </p>\n    <p class="controls">Invert Drag Controls\n      <input type="checkbox" id="invert">\n    </p>\n  </div>\n  <div class="info2" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n\n</html>'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n</head>\n\n<body>\n  <canvas id="canvas"></canvas>\n  <div class="left display">\n    <p id="position"></p>\n  </div>\n  <div class="right display">\n    <p id="position2"></p>\n  </div>\n  <img class="left arrow" id="left" src="../../assets/imgs/left.png">\n  <img class="right arrow" id="right" src="../../assets/imgs/right.png">\n  <div class="info">\n    <!-- <div class="hr"></div> -->\n    <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n    <label for="upload">\n      <img class="icon" src="../../assets/imgs/upload.png"> </label>\n    <input id="upload" type="file" style="display: none">\n    \n    <img class="icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n    <img class="icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none">\n    <!-- <button id="tilt" style="display: none">Tilt</button> -->\n    <!-- <div class="hr"></div> -->\n    <p class="controls">Automatic scrolling\n      <input type="checkbox" id="toggle">\n    </p>\n    <p class="controls">Invert Drag Controls\n      <input type="checkbox" id="invert">\n    </p>\n  </div>\n  <div class="info2" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n\n</html>'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]) === "function" && _b || Object])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]])
     ], HomePage);
     return HomePage;
-    var _a, _b;
 }());
 
 window.onload = function () {
@@ -394,13 +393,16 @@ function toggleSpin() {
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
     tilt = !tilt;
+    // let tiltButton = document.querySelector("#tilt")
     var tiltButton = document.querySelector("#tilt");
     if (tilt) {
-        tiltButton.innerHTML = "Stop";
+        tiltButton.src = "../../assets/imgs/phone.png";
+        // tiltButton.innerHTML = "Stop"
         initRot = currRot;
     }
     else {
-        tiltButton.innerHTML = "Tilt";
+        tiltButton.src = "../../assets/imgs/tilt.png";
+        // tiltButton.innerHTML = "Tilt"
         awake.disable();
         tiltButton.addEventListener('click', enableNoSleep);
     }
