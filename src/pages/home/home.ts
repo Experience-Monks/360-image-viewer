@@ -6,7 +6,7 @@ import * as create360Viewer from '360-image-viewer';
 import * as dragDrop from 'drag-drop';
 import * as noSleep from 'nosleep.js';
 
-const decimalDigits = 3;
+const decimalDigits = 3;    // number of decimal places to round values
 
 var mobile = false;         // if being run on a phone
 var autoSpin = false;       // whether to rotate the view
@@ -26,6 +26,7 @@ var canvasSize = [0, 0]     // current canvas size
 var scalingFactors;         // holds scaling factors
 
 var awake = new noSleep();
+const defaultPicture = "../../assets/imgs/pano.jpg"
 
 @Component({
   selector: 'page-home',
@@ -39,10 +40,7 @@ export class HomePage {
   }
 }
 window.onload = () => {
-  
-  
-  
-    // Desktop setup
+  // Desktop setup
   if (!mobile) {
     document.getElementById("spin").style.display = "";
     mouseSetup();
@@ -69,19 +67,22 @@ window.onload = () => {
     });
 
   }
- 
+  // General setup
+  document.querySelector("#upload").addEventListener("change", uploadPhoto);
+  
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
   const canvas = createCanvas({
     canvas: document.querySelector('#canvas'),
   });
 
-  // Load your image
+  // Create and set up image
   const image = new Image();
+  image.src = defaultPicture;
 
   image.onload = () => {
     // Setup the 360 viewer
-    const viewer = create360Viewer({ 
-      image: image, 
+    const viewer = create360Viewer({
+      image: image,
       canvas: canvas,
       damping: 0.25,
       zoom: true,       // Need to change in ~/node_modules/360-image-viewer/index.js
@@ -91,11 +92,11 @@ window.onload = () => {
 
     if (!mobile)
       setupDragDrop(canvas, viewer);
-    
+
     // Start canvas render loop
     viewerSetup(viewer);
     viewer.start();
-    
+
     viewer.on('tick', (dt) => {
       // To be deleted
       if (!mobile) {
@@ -108,10 +109,10 @@ window.onload = () => {
       if (shift && !mobile) {
         cursorScrolling();
       } else if (tilt && mobile && !viewer.controls.dragging) {
-          tiltScrolling();
+        tiltScrolling();
       } else if (autoSpin && !viewer.controls.dragging) {
-          autoSpinning(dt);
-      } 
+        autoSpinning(dt);
+      }
     });
 
     // Handle automatic scrolling
@@ -136,13 +137,13 @@ window.onload = () => {
     function tiltScrolling() {
       let xdiff = roundDecimal(smallestDiff(initRot[2], currRot[2], 90), decimalDigits); // z axis
       let ydiff = roundDecimal(smallestDiff(initRot[1], currRot[1], 90), decimalDigits); // y axis
-      
+
       // swap if landscape orientation
       if (portrait % 2 != 0) {
         let temp = xdiff;
         xdiff = ydiff;
         ydiff = temp;
-      } 
+      }
       // Negate values as necessary
       // 0: x=x, y=y, 1: x=-y, y=x, 2: x=-x, y=-y, 3: x=y, y=-x
       if (portrait != 0) {
@@ -151,7 +152,7 @@ window.onload = () => {
         if (portrait < 3)
           xdiff = -xdiff;
       }
-      
+
       viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0] // (canvasSize[0] / 4);
       viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1] // (canvasSize[1] / 4);
       // To be deleted
@@ -167,7 +168,7 @@ window.onload = () => {
     }
 
     // Setup drag and drop for uploading new photos on desktop
-    function setupDragDrop (canvas, viewer) {
+    function setupDragDrop(canvas, viewer) {
       const dropRegion = document.querySelector('#drop-region');
       dragDrop(canvas, {
         onDragEnter: () => {
@@ -191,13 +192,24 @@ window.onload = () => {
     }
   };
 
-  image.src = "../../assets/imgs/pano.jpg";
+  
+
+  
+
+  function uploadPhoto() {
+    if (this.files && this.files[0]) {
+        image.src = URL.createObjectURL(this.files[0]); // set src to file url
+    }
+  }
+
 }
 
+
+
 // Utility to create a device pixel scaled canvas
-function createCanvas (opt = <any>{}) {
+function createCanvas(opt = <any>{}) {
   // default to full screen (no width/height specified)
-  const viewport = opt.viewport || [ 0, 0 ];
+  const viewport = opt.viewport || [0, 0];
 
   const canvas = opt.canvas || document.createElement('canvas');
   canvas.style.position = 'absolute';
@@ -241,7 +253,7 @@ function createCanvas (opt = <any>{}) {
 // Prevents the screen from going to sleep on mobile
 function enableNoSleep() {
   awake.enable();
-  alert("no more sleeping")
+  // alert("no more sleeping")
   document.getElementById("tilt").removeEventListener('click', enableNoSleep);
 }
 
@@ -249,18 +261,18 @@ function enableNoSleep() {
 function recalculateOrientation() {
   // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
   portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] >= 0 ? 0 : 2)
-                                           : (currAcc[0] >= 0 ? 3 : 1);
+    : (currAcc[0] >= 0 ? 3 : 1);
   if (tilt)
     toggleTilt();
 }
 
-// Set up controls for the viewer
+// Set up movement controls for the viewer
 function viewerSetup(viewer) {
   // Personal Preference
   invertDrag();
 
   // Set up key handlers
-  if (!mobile) { 
+  if (!mobile) {
     document.body.onkeydown = checkKeyDown;
     document.body.onkeyup = checkKeyUp;
   }
@@ -293,7 +305,7 @@ function viewerSetup(viewer) {
       case 40: moveDown(); break;
     }
   }
-  
+
   // Calls helper methods based on which keys released
   function checkKeyUp(e) {
     e = e || window.event;
@@ -345,8 +357,8 @@ function shiftOff() {
 
 // Toggles auto spin triggered by a keypress
 function toggleSpinKeyDown() {
-  (<HTMLInputElement>document.getElementById("toggle")).checked = 
-          !(<HTMLInputElement>document.getElementById("toggle")).checked;
+  (<HTMLInputElement>document.getElementById("toggle")).checked =
+    !(<HTMLInputElement>document.getElementById("toggle")).checked;
   toggleSpin();
 }
 
@@ -358,13 +370,14 @@ function toggleSpin() {
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
   tilt = !tilt;
+  let tiltButton = document.querySelector("#tilt")
   if (tilt) {
-    document.getElementById("tilt").innerHTML = "Stop"
+    tiltButton.innerHTML = "Stop"
     initRot = currRot;
   } else {
-    document.getElementById("tilt").innerHTML = "Tilt"
+    tiltButton.innerHTML = "Tilt"
     awake.disable();
-    document.getElementById("tilt").addEventListener('click', enableNoSleep);
+    tiltButton.addEventListener('click', enableNoSleep);
   }
 }
 

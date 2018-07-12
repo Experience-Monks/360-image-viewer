@@ -1,152 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <title>My 360-image-viewer</title>
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
-  <style>
-  body {
-    margin: 0;
-    font-family: 'Source Sans Pro', Helvetica, sans-serif;
-    overflow: hidden;
-  }
-  * {
-    -webkit-touch-callout:none;
-    -webkit-text-size-adjust:none;
-    -webkit-tap-highlight-color:rgba(0,0,0,0);
-    -webkit-user-select:none;
-  }
-  .display {
-    width: 50px;
-    height: 80px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 20px;
-    display: block;
-    background: black;
-  }
-  .display2 {
-    width: 50px;
-    height: 80px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 20px;
-    display: block;
-    background: black;
-  }
-  .info {
-    position: absolute;
-    width: 115px;
-    bottom: 0;
-    left: 0;
-    margin: 20px;
-    padding: 5px;
-    pointer-events: auto; /* Previously set to none */
-    background-color: rgba(0, 0, 0, 0.5)
-  }
-  .info2 {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    margin: 20px;
-    text-align: right;
-  }
-  .hr {
-    width: 20px;
-    height: 1px;
-    margin: 0;
-    padding: 0;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    /* float: right; */
-    display: block;
-    background: white;
-    /* vertical-align: middle; */
-  }
-  p {
-    display: block;
-    margin: 0;
-    padding: 0;
-    /* vertical-align: middle; */
-    color: white;
-    font-size: 10px;
-  }
-  canvas, .grab {
-    cursor: -webkit-grab;
-    cursor: -moz-grab;
-  }
-  canvas:active, .grabbing {
-    cursor: -webkit-grabbing;
-    cursor: -moz-grabbing; 
-  }
-  .button{
-    width: 30px;
-    height: 30px;
-    position: absolute;
-    bottom: 50%;
-    margin: 20px;
-    pointer-events: auto; /* Previously set to none */
-  }
-  .left {
-    left: 0;
-  }
-  .right {
-    right: 0;
-  }
-  #drop-region {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
-    pointer-events: none;
-    border: 2px dashed white;
-    box-sizing: border-box;
-    border-radius: 10px;
-    padding: 10px;
-    mix-blend-mode: overlay;
-    box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);
-  }
-  #spin, #tilt {
-    float: right;
-  }
-  input[type="checkbox"] {
-    float: right
-  }
-  .controls{
-    margin-top: 5px;
-  }
-  </style>
 </head>
-
 
 <body>
   <canvas id="canvas"></canvas>
-  <div class="display">
+  <div class="left display">
     <p id="position"></p>
   </div>
-  <div class="display2">
+  <div class="right display">
     <p id="position2"></p>
   </div>
-  <img class="left button" id="left" src="../../assets/imgs/left.png">
-  <img class="right button" id="right" src="../../assets/imgs/right.png">
-  <!-- <button class="right" id="right">Move right</button>
-  <button class="left" id="left">Move left</button> -->
+  <img class="left arrow" id="left" src="../../assets/imgs/left.png">
+  <img class="right arrow" id="right" src="../../assets/imgs/right.png">
+  <div class="info">
+    <div class="hr"></div>
+    <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->
+    <label for="upload">
+      <img class="icon" src="../../assets/imgs/upload.png"> </label>
+    <input id="upload" type="file" style="display: none">
     
-    <div class="info">
-      <div class="hr"></div>
-      <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->
-      <button id="upload">Upload</button>
-      <button id="spin" style="display: none">Spin</button>
-      <button id="tilt" style="display: none">Tilt</button>
-      <div class="hr"></div>
-      <p class="controls">Automatic scrolling <input type="checkbox" id="toggle"></p>
-      <p class="controls">Invert Drag Controls <input type="checkbox" id="invert"></p>
-    </div>
-    <div class="info2" style="display: none">
+    <img class="icon" id="spin" src="../../assets/imgs/spin.png" style="display: none">
+    <button id="tilt" style="display: none">Tilt</button>
+    <div class="hr"></div>
+    <p class="controls">Automatic scrolling
+      <input type="checkbox" id="toggle">
+    </p>
+    <p class="controls">Invert Drag Controls
+      <input type="checkbox" id="invert">
+    </p>
+  </div>
+  <div class="info2" style="display: none">
     <div class="hr"></div>
     <p>Press SPACE to toggle auto spin</p>
     <p>Use the ARROW KEYS to move around</p>
@@ -155,4 +44,5 @@
   <div id="drop-region" style="display: none"></div>
   <script src="bundle.js"></script>
 </body>
+
 </html>

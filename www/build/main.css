@@ -25677,3 +25677,131 @@ ion-navbar.toolbar {
   min-height: calc(46px + constant(safe-area-inset-bottom));
   min-height: calc(46px + env(safe-area-inset-bottom));
 }
+
+page-home body {
+  margin: 0;
+  font-family: 'Source Sans Pro', Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+page-home * {
+  -webkit-touch-callout: none;
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-select: none;
+}
+
+page-home .info {
+  position: absolute;
+  width: 115px;
+  bottom: 0;
+  left: 0;
+  margin: 20px;
+  padding: 5px;
+  pointer-events: auto;
+  /* Previously set to none */
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+page-home .info2 {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 20px;
+  text-align: right;
+}
+
+page-home .hr {
+  width: 20px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: block;
+  background: white;
+}
+
+page-home p {
+  display: block;
+  margin: 0;
+  padding: 0;
+  /* vertical-align: middle; */
+  color: white;
+  font-size: 10px;
+}
+
+page-home canvas,
+page-home .grab {
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+}
+
+page-home canvas:active,
+page-home .grabbing {
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing;
+}
+
+page-home #drop-region {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  pointer-events: none;
+  border: 2px dashed white;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  border-radius: 10px;
+  padding: 10px;
+  mix-blend-mode: overlay;
+  -webkit-box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);
+}
+
+page-home .arrow {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 50%;
+  margin: 20px;
+  pointer-events: auto;
+  /* Previously set to none */
+}
+
+page-home .left {
+  left: 0;
+}
+
+page-home .right {
+  right: 0;
+}
+
+page-home #spin,
+page-home #tilt {
+  float: right;
+}
+
+page-home input[type="checkbox"] {
+  float: right;
+}
+
+page-home .controls {
+  margin-top: 5px;
+}
+
+page-home .icon {
+  width: 20px;
+  height: 20px;
+}
+
+page-home .display {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  margin: 20px;
+  display: block;
+  background: black;
+}

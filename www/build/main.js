@@ -62,7 +62,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var decimalDigits = 3;
+var decimalDigits = 3; // number of decimal places to round values
 var mobile = false; // if being run on a phone
 var autoSpin = false; // whether to rotate the view
 var panUp = true; // initial vertical spin direction
@@ -79,6 +79,7 @@ var currPos = [0, 0]; // current position
 var canvasSize = [0, 0]; // current canvas size
 var scalingFactors; // holds scaling factors
 var awake = new __WEBPACK_IMPORTED_MODULE_4_nosleep_js__();
+var defaultPicture = "../../assets/imgs/pano.jpg";
 var HomePage = /** @class */ (function () {
     function HomePage(navCtrl, platform) {
         this.navCtrl = navCtrl;
@@ -87,7 +88,7 @@ var HomePage = /** @class */ (function () {
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n  <style>\n  body {\n    margin: 0;\n    font-family: \'Source Sans Pro\', Helvetica, sans-serif;\n    overflow: hidden;\n  }\n  * {\n    -webkit-touch-callout:none;\n    -webkit-text-size-adjust:none;\n    -webkit-tap-highlight-color:rgba(0,0,0,0);\n    -webkit-user-select:none;\n  }\n  .display {\n    width: 50px;\n    height: 80px;\n    position: absolute;\n    top: 0;\n    left: 0;\n    margin: 20px;\n    display: block;\n    background: black;\n  }\n  .display2 {\n    width: 50px;\n    height: 80px;\n    position: absolute;\n    top: 0;\n    right: 0;\n    margin: 20px;\n    display: block;\n    background: black;\n  }\n  .info {\n    position: absolute;\n    width: 115px;\n    bottom: 0;\n    left: 0;\n    margin: 20px;\n    padding: 5px;\n    pointer-events: auto; /* Previously set to none */\n    background-color: rgba(0, 0, 0, 0.5)\n  }\n  .info2 {\n    position: absolute;\n    bottom: 0;\n    right: 0;\n    margin: 20px;\n    text-align: right;\n  }\n  .hr {\n    width: 20px;\n    height: 1px;\n    margin: 0;\n    padding: 0;\n    margin-top: 10px;\n    margin-bottom: 10px;\n    /* float: right; */\n    display: block;\n    background: white;\n    /* vertical-align: middle; */\n  }\n  p {\n    display: block;\n    margin: 0;\n    padding: 0;\n    /* vertical-align: middle; */\n    color: white;\n    font-size: 10px;\n  }\n  canvas, .grab {\n    cursor: -webkit-grab;\n    cursor: -moz-grab;\n  }\n  canvas:active, .grabbing {\n    cursor: -webkit-grabbing;\n    cursor: -moz-grabbing; \n  }\n  .button{\n    width: 30px;\n    height: 30px;\n    position: absolute;\n    bottom: 50%;\n    margin: 20px;\n    pointer-events: auto; /* Previously set to none */\n  }\n  .left {\n    left: 0;\n  }\n  .right {\n    right: 0;\n  }\n  #drop-region {\n    position: absolute;\n    top: 5px;\n    left: 5px;\n    width: calc(100% - 10px);\n    height: calc(100% - 10px);\n    pointer-events: none;\n    border: 2px dashed white;\n    box-sizing: border-box;\n    border-radius: 10px;\n    padding: 10px;\n    mix-blend-mode: overlay;\n    box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);\n  }\n  #spin, #tilt {\n    float: right;\n  }\n  input[type="checkbox"] {\n    float: right\n  }\n  .controls{\n    margin-top: 5px;\n  }\n  </style>\n</head>\n\n\n<body>\n  <canvas id="canvas"></canvas>\n  <div class="display">\n    <p id="position"></p>\n  </div>\n  <div class="display2">\n    <p id="position2"></p>\n  </div>\n  <img class="left button" id="left" src="../../assets/imgs/left.png">\n  <img class="right button" id="right" src="../../assets/imgs/right.png">\n  <!-- <button class="right" id="right">Move right</button>\n  <button class="left" id="left">Move left</button> -->\n    \n    <div class="info">\n      <div class="hr"></div>\n      <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n      <button id="upload">Upload</button>\n      <button id="spin" style="display: none">Spin</button>\n      <button id="tilt" style="display: none">Tilt</button>\n      <div class="hr"></div>\n      <p class="controls">Automatic scrolling <input type="checkbox" id="toggle"></p>\n      <p class="controls">Invert Drag Controls <input type="checkbox" id="invert"></p>\n    </div>\n    <div class="info2" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n</html>\n'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n</head>\n\n<body>\n  <canvas id="canvas"></canvas>\n  <div class="left display">\n    <p id="position"></p>\n  </div>\n  <div class="right display">\n    <p id="position2"></p>\n  </div>\n  <img class="left arrow" id="left" src="../../assets/imgs/left.png">\n  <img class="right arrow" id="right" src="../../assets/imgs/right.png">\n  <div class="info">\n    <div class="hr"></div>\n    <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n    <label for="upload">\n      <img class="icon" src="../../assets/imgs/upload.png"> </label>\n    <input id="upload" type="file" style="display: none">\n    \n    <img class="icon" id="spin" src="../../assets/imgs/spin.png" style="display: none">\n    <button id="tilt" style="display: none">Tilt</button>\n    <div class="hr"></div>\n    <p class="controls">Automatic scrolling\n      <input type="checkbox" id="toggle">\n    </p>\n    <p class="controls">Invert Drag Controls\n      <input type="checkbox" id="invert">\n    </p>\n  </div>\n  <div class="info2" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n\n</html>'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
         }),
         __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]) === "function" && _b || Object])
     ], HomePage);
@@ -118,12 +119,15 @@ window.onload = function () {
             alert(initRot.join("\n"));
         });
     }
+    // General setup
+    document.querySelector("#upload").addEventListener("change", uploadPhoto);
     // Get a canvas of some sort, e.g. fullscreen or embedded in a site
     var canvas = createCanvas({
         canvas: document.querySelector('#canvas'),
     });
-    // Load your image
+    // Create and set up image
     var image = new Image();
+    image.src = defaultPicture;
     image.onload = function () {
         // Setup the 360 viewer
         var viewer = __WEBPACK_IMPORTED_MODULE_2_360_image_viewer__({
@@ -227,7 +231,11 @@ window.onload = function () {
             });
         }
     };
-    image.src = "../../assets/imgs/pano.jpg";
+    function uploadPhoto() {
+        if (this.files && this.files[0]) {
+            image.src = URL.createObjectURL(this.files[0]); // set src to file url
+        }
+    }
 };
 // Utility to create a device pixel scaled canvas
 function createCanvas(opt) {
@@ -271,7 +279,7 @@ function createCanvas(opt) {
 // Prevents the screen from going to sleep on mobile
 function enableNoSleep() {
     awake.enable();
-    alert("no more sleeping");
+    // alert("no more sleeping")
     document.getElementById("tilt").removeEventListener('click', enableNoSleep);
 }
 // Calculates the orientation of the mobile device
@@ -282,7 +290,7 @@ function recalculateOrientation() {
     if (tilt)
         toggleTilt();
 }
-// Set up controls for the viewer
+// Set up movement controls for the viewer
 function viewerSetup(viewer) {
     // Personal Preference
     invertDrag();
@@ -386,14 +394,15 @@ function toggleSpin() {
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
     tilt = !tilt;
+    var tiltButton = document.querySelector("#tilt");
     if (tilt) {
-        document.getElementById("tilt").innerHTML = "Stop";
+        tiltButton.innerHTML = "Stop";
         initRot = currRot;
     }
     else {
-        document.getElementById("tilt").innerHTML = "Tilt";
+        tiltButton.innerHTML = "Tilt";
         awake.disable();
-        document.getElementById("tilt").addEventListener('click', enableNoSleep);
+        tiltButton.addEventListener('click', enableNoSleep);
     }
 }
 // Read and cache mouse position
