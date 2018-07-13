@@ -7,26 +7,29 @@ import * as dragDrop from 'drag-drop';
 import * as noSleep from 'nosleep.js';
 
 const decimalDigits = 3;    // number of decimal places to round values
+const imagePath = "../../assets/imgs/"
+const defaultPicture = "pano.jpg"
+const awake = new noSleep();
 
-var mobile = false;         // if being run on a phone
-var autoSpin = false;       // whether to rotate the view
-var panUp = true;           // initial vertical spin direction
-var shift = false;          // if the shift key is held
-var tilt = false;           // if mobile is in tilt mode
+let mobile = false;         // if being run on a phone
+let autoSpin = false;       // whether to rotate the view
+let panUp = true;           // initial vertical spin direction
+let shift = false;          // if the shift key is held
+let tilt = false;           // if mobile is in tilt mode
 
-var portrait = 0;           // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
-var initMouse = [0, 0]      // initial cursor position
-var currMouse = [0, 0]      // current cursor position
-var currAcc = [0, 0, 0]     // current acceleration
-var initRot = [0, 0, 0]     // current rotation
-var currRot = [0, 0, 0]     // current rotation
-var rotSpeed = [0, 0, 0]    // movement in each axis (To be deleted)
-var currPos = [0, 0]        // current position
-var canvasSize = [0, 0]     // current canvas size
-var scalingFactors;         // holds scaling factors
+let portrait = 0;           // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
+let initMouse = [0, 0]      // initial cursor position
+let currMouse = [0, 0]      // current cursor position
+let currAcc = [0, 0, 0]     // current acceleration
+let initRot = [0, 0, 0]     // current rotation
+let currRot = [0, 0, 0]     // current rotation
+let rotSpeed = [0, 0, 0]    // movement in each axis (To be deleted)
+let currPos = [0, 0]        // current position
+let canvasSize = [0, 0]     // current canvas size
+let scalingFactors;         // holds scaling factors
 
-var awake = new noSleep();
-const defaultPicture = "../../assets/imgs/pano.jpg"
+
+
 
 @Component({
   selector: 'page-home',
@@ -37,6 +40,8 @@ const defaultPicture = "../../assets/imgs/pano.jpg"
 export class HomePage {
   constructor(public navCtrl: NavController, public platform: Platform) {
     mobile = this.platform.is('mobileweb');
+    scalingFactors = mobile ? [0.00003, 0.00003]
+                            : [0.000065, 0.000050]
   }
 }
 window.onload = () => {
@@ -47,7 +52,7 @@ window.onload = () => {
 
     // To be deleted
     (<HTMLElement>document.getElementsByClassName("info2")[0]).style.display = "";
-    scalingFactors = [0.000065, 0.000050];
+    // scalingFactors = [0.000065, 0.000050];
   }
   // Mobile browser setup
   else {
@@ -58,7 +63,7 @@ window.onload = () => {
       rotSetup();
       accSetup();
 
-      scalingFactors = [0.00003, 0.00003];
+      // scalingFactors = [0.00003, 0.00003];
     }
 
     // To be deleted
@@ -68,7 +73,8 @@ window.onload = () => {
 
   }
   // General setup
-  document.querySelector("#upload").addEventListener("change", uploadPhoto);
+  // document.querySelector("#upload").addEventListener("change", uploadPhoto);
+  (<HTMLElement>document.querySelector("#upload")).onchange = uploadPhoto;
   
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
   const canvas = createCanvas({
@@ -77,7 +83,7 @@ window.onload = () => {
 
   // Create and set up image
   const image = new Image();
-  image.src = defaultPicture;
+  image.src = imagePath + defaultPicture;
 
   image.onload = () => {
     // Setup the 360 viewer
@@ -192,13 +198,13 @@ window.onload = () => {
     }
   };
 
-  
-
-  
-
   function uploadPhoto() {
     if (this.files && this.files[0]) {
         image.src = URL.createObjectURL(this.files[0]); // set src to file url
+        // To be deleted
+        alert(this.files[0])
+        alert(URL.createObjectURL(this.files[0]))
+        this.files = null
     }
   }
 
@@ -278,8 +284,8 @@ function viewerSetup(viewer) {
   }
 
   // Set up checkbox handlers
-  document.getElementById("invert").onchange = invertDrag;
-  document.getElementById("toggle").onchange = toggleSpin;
+  document.getElementById("invert").onclick = invertDrag;
+  document.getElementById("toggle").onclick = toggleSpin;
 
   // Set up button handlers
   mobile ? document.getElementById("tilt").onclick = toggleTilt
@@ -373,12 +379,10 @@ function toggleTilt() {
   // let tiltButton = document.querySelector("#tilt")
   let tiltButton = <HTMLImageElement>document.querySelector("#tilt")
   if (tilt) {
-    tiltButton.src = "../../assets/imgs/iphone.png";
-    // tiltButton.innerHTML = "Stop"
+    tiltButton.src = imagePath + "iphone.png";
     initRot = currRot;
   } else {
-    tiltButton.src = "../../assets/imgs/tilt.png";
-    // tiltButton.innerHTML = "Tilt"
+    tiltButton.src = imagePath + "tilt.png";
     awake.disable();
     tiltButton.addEventListener('click', enableNoSleep);
   }

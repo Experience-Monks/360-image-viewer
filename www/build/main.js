@@ -63,6 +63,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 var decimalDigits = 3; // number of decimal places to round values
+var imagePath = "../../assets/imgs/";
+var defaultPicture = "pano.jpg";
+var awake = new __WEBPACK_IMPORTED_MODULE_4_nosleep_js__();
 var mobile = false; // if being run on a phone
 var autoSpin = false; // whether to rotate the view
 var panUp = true; // initial vertical spin direction
@@ -78,13 +81,13 @@ var rotSpeed = [0, 0, 0]; // movement in each axis (To be deleted)
 var currPos = [0, 0]; // current position
 var canvasSize = [0, 0]; // current canvas size
 var scalingFactors; // holds scaling factors
-var awake = new __WEBPACK_IMPORTED_MODULE_4_nosleep_js__();
-var defaultPicture = "../../assets/imgs/pano.jpg";
 var HomePage = /** @class */ (function () {
     function HomePage(navCtrl, platform) {
         this.navCtrl = navCtrl;
         this.platform = platform;
         mobile = this.platform.is('mobileweb');
+        scalingFactors = mobile ? [0.00003, 0.00003]
+            : [0.000065, 0.000050];
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
@@ -102,7 +105,7 @@ window.onload = function () {
         mouseSetup();
         // To be deleted
         document.getElementsByClassName("info2")[0].style.display = "";
-        scalingFactors = [0.000065, 0.000050];
+        // scalingFactors = [0.000065, 0.000050];
     }
     else {
         // Set up tilt controls if supported
@@ -111,7 +114,7 @@ window.onload = function () {
             document.getElementById("tilt").addEventListener("click", enableNoSleep);
             rotSetup();
             accSetup();
-            scalingFactors = [0.00003, 0.00003];
+            // scalingFactors = [0.00003, 0.00003];
         }
         // To be deleted
         document.getElementsByClassName("display")[0].addEventListener("click", function () {
@@ -119,14 +122,15 @@ window.onload = function () {
         });
     }
     // General setup
-    document.querySelector("#upload").addEventListener("change", uploadPhoto);
+    // document.querySelector("#upload").addEventListener("change", uploadPhoto);
+    document.querySelector("#upload").onchange = uploadPhoto;
     // Get a canvas of some sort, e.g. fullscreen or embedded in a site
     var canvas = createCanvas({
         canvas: document.querySelector('#canvas'),
     });
     // Create and set up image
     var image = new Image();
-    image.src = defaultPicture;
+    image.src = imagePath + defaultPicture;
     image.onload = function () {
         // Setup the 360 viewer
         var viewer = __WEBPACK_IMPORTED_MODULE_2_360_image_viewer__({
@@ -233,6 +237,10 @@ window.onload = function () {
     function uploadPhoto() {
         if (this.files && this.files[0]) {
             image.src = URL.createObjectURL(this.files[0]); // set src to file url
+            // To be deleted
+            alert(this.files[0]);
+            alert(URL.createObjectURL(this.files[0]));
+            this.files = null;
         }
     }
 };
@@ -299,8 +307,8 @@ function viewerSetup(viewer) {
         document.body.onkeyup = checkKeyUp;
     }
     // Set up checkbox handlers
-    document.getElementById("invert").onchange = invertDrag;
-    document.getElementById("toggle").onchange = toggleSpin;
+    document.getElementById("invert").onclick = invertDrag;
+    document.getElementById("toggle").onclick = toggleSpin;
     // Set up button handlers
     mobile ? document.getElementById("tilt").onclick = toggleTilt
         : document.getElementById("spin").onclick = toggleSpinKeyDown;
@@ -396,13 +404,11 @@ function toggleTilt() {
     // let tiltButton = document.querySelector("#tilt")
     var tiltButton = document.querySelector("#tilt");
     if (tilt) {
-        tiltButton.src = "../../assets/imgs/phone.png";
-        // tiltButton.innerHTML = "Stop"
+        tiltButton.src = imagePath + "iphone.png";
         initRot = currRot;
     }
     else {
-        tiltButton.src = "../../assets/imgs/tilt.png";
-        // tiltButton.innerHTML = "Tilt"
+        tiltButton.src = imagePath + "tilt.png";
         awake.disable();
         tiltButton.addEventListener('click', enableNoSleep);
     }
