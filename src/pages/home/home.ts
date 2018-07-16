@@ -11,25 +11,24 @@ const imagePath = "../../assets/imgs/"
 const defaultPicture = "pano.jpg"
 const awake = new noSleep();
 
-let mobile = false;         // if being run on a phone
+let mobile = false;         // if being run on a mobile device
+let tablet = false;         // if being run on a tablet
 let autoSpin = false;       // whether to rotate the view
 let panUp = true;           // initial vertical spin direction
 let shift = false;          // if the shift key is held
 let tilt = false;           // if mobile is in tilt mode
+let scalingFactors;         // holds scaling factors
 
-let portrait = 0;           // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
 let initMouse = [0, 0]      // initial cursor position
 let currMouse = [0, 0]      // current cursor position
+let currPos = [0, 0]        // current position
+
+let portrait = 0;           // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
+let canvasSize = [0, 0]     // current canvas size
 let currAcc = [0, 0, 0]     // current acceleration
 let initRot = [0, 0, 0]     // current rotation
 let currRot = [0, 0, 0]     // current rotation
 let rotSpeed = [0, 0, 0]    // movement in each axis (To be deleted)
-let currPos = [0, 0]        // current position
-let canvasSize = [0, 0]     // current canvas size
-let scalingFactors;         // holds scaling factors
-
-
-
 
 @Component({
   selector: 'page-home',
@@ -40,6 +39,7 @@ let scalingFactors;         // holds scaling factors
 export class HomePage {
   constructor(public navCtrl: NavController, public platform: Platform) {
     mobile = this.platform.is('mobileweb');
+    if (mobile) tablet = this.platform.is('tablet');
     scalingFactors = mobile ? [0.00003, 0.00003]
                             : [0.000065, 0.000050]
   }
@@ -47,23 +47,25 @@ export class HomePage {
 window.onload = () => {
   // Desktop setup
   if (!mobile) {
-    document.getElementById("spin").style.display = "";
+    Array.from(document.querySelectorAll(".desktop.icon")).forEach(element => {
+      (<HTMLElement>element).style.display = "";
+    });
     mouseSetup();
-
+    
     // To be deleted
-    (<HTMLElement>document.getElementsByClassName("info2")[0]).style.display = "";
-    // scalingFactors = [0.000065, 0.000050];
+    (<HTMLElement>document.querySelector(".right.info")).style.display = "";
   }
   // Mobile browser setup
   else {
     // Set up tilt controls if supported
     if ("ondeviceorientation" in window) {
-      document.getElementById("tilt").style.display = "";
-      document.getElementById("tilt").addEventListener("click", enableNoSleep);
+      Array.from(document.querySelectorAll(".mobile.icon")).forEach(element => {
+        (<HTMLElement>element).style.display = "";
+      });
+      // document.getElementById("tilt").style.display = "";
+      document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
       rotSetup();
       accSetup();
-
-      // scalingFactors = [0.00003, 0.00003];
     }
 
     // To be deleted
@@ -73,7 +75,6 @@ window.onload = () => {
 
   }
   // General setup
-  // document.querySelector("#upload").addEventListener("change", uploadPhoto);
   (<HTMLElement>document.querySelector("#upload")).onchange = uploadPhoto;
   
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
@@ -126,8 +127,8 @@ window.onload = () => {
       dt = dt < 20 ? dt : 16.8;   // Makes sure dt doesn't become too high
       viewer.controls.theta -= dt * 0.00005; // Horizontal movement
       // Determine when to switch vertical direction
-      panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
-      panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
+      panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : 
+             (viewer.controls.phi <= 0.48 * Math.PI ? true : panUp)
       viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1); // Vertical movement
     }
 
@@ -198,6 +199,7 @@ window.onload = () => {
     }
   };
 
+  // Sets the uploaded image to be viewed
   function uploadPhoto() {
     if (this.files && this.files[0]) {
         image.src = URL.createObjectURL(this.files[0]); // set src to file url
@@ -267,7 +269,9 @@ function enableNoSleep() {
 function recalculateOrientation() {
   // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
   portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] >= 0 ? 0 : 2)
-    : (currAcc[0] >= 0 ? 3 : 1);
+                                           : (currAcc[0] >= 0 ? 3 : 1);
+  if (tablet)
+    portrait = (portrait + 1) % 4
   if (tilt)
     toggleTilt();
 }
@@ -284,14 +288,14 @@ function viewerSetup(viewer) {
   }
 
   // Set up checkbox handlers
-  document.getElementById("invert").onclick = invertDrag;
-  document.getElementById("toggle").onclick = toggleSpin;
+  // document.getElementById("invert").onclick = invertDrag;
+  // document.getElementById("toggle").onclick = toggleSpin;
 
   // Set up button handlers
-  mobile ? document.getElementById("tilt").onclick = toggleTilt
-         : document.getElementById("spin").onclick = toggleSpinKeyDown;
-  document.getElementById("left").onclick = moveLeft;
-  document.getElementById("right").onclick = moveRight;
+  (<HTMLImageElement>document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin")).onclick = toggleSpin;
+  if (mobile) (<HTMLImageElement>document.querySelector("#tilt")).onclick = toggleTilt;
+  (<HTMLImageElement>document.querySelector("#left")).onclick = moveLeft;
+  (<HTMLImageElement>document.querySelector("#right")).onclick = moveRight;
 
   // Calls helper methods based on which keys pressed
   function checkKeyDown(e) {
@@ -300,7 +304,7 @@ function viewerSetup(viewer) {
       // shift
       case 16: shiftOn(); break;
       // space
-      case 32: toggleSpinKeyDown(); break;
+      case 32: toggleSpin(); break;
       // left arrow
       case 37: moveLeft(); break;
       // up arrow
@@ -362,21 +366,25 @@ function shiftOff() {
 }
 
 // Toggles auto spin triggered by a keypress
-function toggleSpinKeyDown() {
-  (<HTMLInputElement>document.getElementById("toggle")).checked =
-    !(<HTMLInputElement>document.getElementById("toggle")).checked;
-  toggleSpin();
-}
+// function toggleSpinKeyDown() {
+  // (<HTMLInputElement>document.getElementById("toggle")).checked =
+  //   !(<HTMLInputElement>document.getElementById("toggle")).checked;
+//   toggleSpin();
+// }
 
 // Toggles auto spin
 function toggleSpin() {
   autoSpin = !autoSpin;
+  
+  let spinButton = <HTMLImageElement>document.querySelector(
+                   (mobile ? ".mobile" : ".desktop") + ".icon#spin");
+  spinButton.src = imagePath + (autoSpin ? "stop.png" : "rotate.png")
 }
 
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
   tilt = !tilt;
-  // let tiltButton = document.querySelector("#tilt")
+
   let tiltButton = <HTMLImageElement>document.querySelector("#tilt")
   if (tilt) {
     tiltButton.src = imagePath + "iphone.png";

@@ -25693,22 +25693,12 @@ page-home * {
 
 page-home .info {
   position: absolute;
-  width: 115px;
   bottom: 0;
-  left: 0;
   margin: 20px;
   padding: 5px;
   pointer-events: auto;
   /* Previously set to none */
   background-color: rgba(0, 0, 0, 0.5);
-}
-
-page-home .info2 {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  margin: 20px;
-  text-align: right;
 }
 
 page-home .hr {
@@ -25778,22 +25768,14 @@ page-home .right {
   right: 0;
 }
 
-page-home #spin,
-page-home #tilt {
-  float: right;
-}
-
-page-home input[type="checkbox"] {
-  float: right;
-}
-
 page-home .controls {
   margin-top: 5px;
 }
 
 page-home .icon {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
+  margin-right: 35px;
 }
 
 page-home .display {
@@ -25804,4 +25786,12 @@ page-home .display {
   margin: 20px;
   display: block;
   background: black;
+}
+
+page-home ul {
+  list-style-type: none;
+}
+
+page-home li {
+  margin: 5px;
 }

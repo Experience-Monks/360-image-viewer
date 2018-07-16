@@ -66,55 +66,62 @@ var decimalDigits = 3; // number of decimal places to round values
 var imagePath = "../../assets/imgs/";
 var defaultPicture = "pano.jpg";
 var awake = new __WEBPACK_IMPORTED_MODULE_4_nosleep_js__();
-var mobile = false; // if being run on a phone
+var mobile = false; // if being run on a mobile device
+var tablet = false; // if being run on a tablet
 var autoSpin = false; // whether to rotate the view
 var panUp = true; // initial vertical spin direction
 var shift = false; // if the shift key is held
 var tilt = false; // if mobile is in tilt mode
-var portrait = 0; // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
+var scalingFactors; // holds scaling factors
 var initMouse = [0, 0]; // initial cursor position
 var currMouse = [0, 0]; // current cursor position
+var currPos = [0, 0]; // current position
+var portrait = 0; // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
+var canvasSize = [0, 0]; // current canvas size
 var currAcc = [0, 0, 0]; // current acceleration
 var initRot = [0, 0, 0]; // current rotation
 var currRot = [0, 0, 0]; // current rotation
 var rotSpeed = [0, 0, 0]; // movement in each axis (To be deleted)
-var currPos = [0, 0]; // current position
-var canvasSize = [0, 0]; // current canvas size
-var scalingFactors; // holds scaling factors
 var HomePage = /** @class */ (function () {
     function HomePage(navCtrl, platform) {
         this.navCtrl = navCtrl;
         this.platform = platform;
         mobile = this.platform.is('mobileweb');
+        if (mobile)
+            tablet = this.platform.is('tablet');
         scalingFactors = mobile ? [0.00003, 0.00003]
             : [0.000065, 0.000050];
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n</head>\n\n<body>\n  <canvas id="canvas"></canvas>\n  <div class="left display">\n    <p id="position"></p>\n  </div>\n  <div class="right display">\n    <p id="position2"></p>\n  </div>\n  <img class="left arrow" id="left" src="../../assets/imgs/left.png">\n  <img class="right arrow" id="right" src="../../assets/imgs/right.png">\n  <div class="info">\n    <!-- <div class="hr"></div> -->\n    <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n    <label for="upload">\n      <img class="icon" src="../../assets/imgs/upload.png"> </label>\n    <input id="upload" type="file" style="display: none">\n    \n    <img class="icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n    <img class="icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none">\n    <!-- <button id="tilt" style="display: none">Tilt</button> -->\n    <!-- <div class="hr"></div> -->\n    <p class="controls">Automatic scrolling\n      <input type="checkbox" id="toggle">\n    </p>\n    <p class="controls">Invert Drag Controls\n      <input type="checkbox" id="invert">\n    </p>\n  </div>\n  <div class="info2" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n\n</html>'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n</head>\n\n<body>\n  <canvas id="canvas"></canvas>\n\n  <!-- To be deleted -->\n  <div class="left display">\n    <p id="position"></p>\n  </div>\n  <div class="right display">\n    <p id="position2"></p>\n  </div>\n\n  <img class="left arrow" id="left" src="../../assets/imgs/left.png">\n  <img class="right arrow" id="right" src="../../assets/imgs/right.png">\n  \n  <div class="left info">\n    <ul>\n      <li>\n        <img class="desktop icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n        <img class="mobile icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none">\n      </li>\n      <li>\n        <img class="desktop icon" id="invert" src="../../assets/imgs/invert.png" style="display: none">\n        <img class="mobile icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n      </li>\n      <li>\n        <label for="upload">\n            <img class="icon" src="../../assets/imgs/upload.png"> </label>\n          <input id="upload" type="file" style="display: none">\n        </li>\n    </ul>\n\n\n    <!-- <div class="hr"></div> -->\n    <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n    <!-- <label for="upload">\n      <img class="icon" src="../../assets/imgs/upload.png"> </label>\n    <input id="upload" type="file" style="display: none">\n    \n    <img class="icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n    <img class="icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none"> -->\n    <!-- <button id="tilt" style="display: none">Tilt</button> -->\n    <!-- <div class="hr"></div> -->\n    <!-- <p class="controls" style="display:none">Automatic scrolling\n      <input type="checkbox" id="toggle">\n    </p>\n    <p class="controls" style="display:none">Invert Drag Controls\n      <input type="checkbox" id="invert">\n    </p> -->\n  </div>\n  <div class="right info" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n\n</html>'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]) === "function" && _b || Object])
     ], HomePage);
     return HomePage;
+    var _a, _b;
 }());
 
 window.onload = function () {
     // Desktop setup
     if (!mobile) {
-        document.getElementById("spin").style.display = "";
+        Array.from(document.querySelectorAll(".desktop.icon")).forEach(function (element) {
+            element.style.display = "";
+        });
         mouseSetup();
         // To be deleted
-        document.getElementsByClassName("info2")[0].style.display = "";
-        // scalingFactors = [0.000065, 0.000050];
+        document.querySelector(".right.info").style.display = "";
     }
     else {
         // Set up tilt controls if supported
         if ("ondeviceorientation" in window) {
-            document.getElementById("tilt").style.display = "";
-            document.getElementById("tilt").addEventListener("click", enableNoSleep);
+            Array.from(document.querySelectorAll(".mobile.icon")).forEach(function (element) {
+                element.style.display = "";
+            });
+            // document.getElementById("tilt").style.display = "";
+            document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
             rotSetup();
             accSetup();
-            // scalingFactors = [0.00003, 0.00003];
         }
         // To be deleted
         document.getElementsByClassName("display")[0].addEventListener("click", function () {
@@ -122,7 +129,6 @@ window.onload = function () {
         });
     }
     // General setup
-    // document.querySelector("#upload").addEventListener("change", uploadPhoto);
     document.querySelector("#upload").onchange = uploadPhoto;
     // Get a canvas of some sort, e.g. fullscreen or embedded in a site
     var canvas = createCanvas({
@@ -169,8 +175,8 @@ window.onload = function () {
             dt = dt < 20 ? dt : 16.8; // Makes sure dt doesn't become too high
             viewer.controls.theta -= dt * 0.00005; // Horizontal movement
             // Determine when to switch vertical direction
-            panUp = viewer.controls.phi >= 0.6 * Math.PI ? false : panUp;
-            panUp = viewer.controls.phi <= 0.48 * Math.PI ? true : panUp;
+            panUp = viewer.controls.phi >= 0.6 * Math.PI ? false :
+                (viewer.controls.phi <= 0.48 * Math.PI ? true : panUp);
             viewer.controls.phi += dt * 0.00005 * (panUp ? 1 : -1); // Vertical movement
         }
         // Handle cursor-guided scrolling
@@ -234,6 +240,7 @@ window.onload = function () {
             });
         }
     };
+    // Sets the uploaded image to be viewed
     function uploadPhoto() {
         if (this.files && this.files[0]) {
             image.src = URL.createObjectURL(this.files[0]); // set src to file url
@@ -294,6 +301,8 @@ function recalculateOrientation() {
     // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
     portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] >= 0 ? 0 : 2)
         : (currAcc[0] >= 0 ? 3 : 1);
+    if (tablet)
+        portrait = (portrait + 1) % 4;
     if (tilt)
         toggleTilt();
 }
@@ -307,13 +316,14 @@ function viewerSetup(viewer) {
         document.body.onkeyup = checkKeyUp;
     }
     // Set up checkbox handlers
-    document.getElementById("invert").onclick = invertDrag;
-    document.getElementById("toggle").onclick = toggleSpin;
+    // document.getElementById("invert").onclick = invertDrag;
+    // document.getElementById("toggle").onclick = toggleSpin;
     // Set up button handlers
-    mobile ? document.getElementById("tilt").onclick = toggleTilt
-        : document.getElementById("spin").onclick = toggleSpinKeyDown;
-    document.getElementById("left").onclick = moveLeft;
-    document.getElementById("right").onclick = moveRight;
+    document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin").onclick = toggleSpin;
+    if (mobile)
+        document.querySelector("#tilt").onclick = toggleTilt;
+    document.querySelector("#left").onclick = moveLeft;
+    document.querySelector("#right").onclick = moveRight;
     // Calls helper methods based on which keys pressed
     function checkKeyDown(e) {
         e = e || window.event;
@@ -324,7 +334,7 @@ function viewerSetup(viewer) {
                 break;
             // space
             case 32:
-                toggleSpinKeyDown();
+                toggleSpin();
                 break;
             // left arrow
             case 37:
@@ -389,19 +399,20 @@ function shiftOff() {
     shift = false;
 }
 // Toggles auto spin triggered by a keypress
-function toggleSpinKeyDown() {
-    document.getElementById("toggle").checked =
-        !document.getElementById("toggle").checked;
-    toggleSpin();
-}
+// function toggleSpinKeyDown() {
+// (<HTMLInputElement>document.getElementById("toggle")).checked =
+//   !(<HTMLInputElement>document.getElementById("toggle")).checked;
+//   toggleSpin();
+// }
 // Toggles auto spin
 function toggleSpin() {
     autoSpin = !autoSpin;
+    var spinButton = document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin");
+    spinButton.src = imagePath + (autoSpin ? "stop.png" : "rotate.png");
 }
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
     tilt = !tilt;
-    // let tiltButton = document.querySelector("#tilt")
     var tiltButton = document.querySelector("#tilt");
     if (tilt) {
         tiltButton.src = imagePath + "iphone.png";
