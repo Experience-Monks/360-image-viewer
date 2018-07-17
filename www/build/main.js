@@ -64,7 +64,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 var decimalDigits = 3; // number of decimal places to round values
 var imagePath = "../../assets/imgs/";
-var defaultPicture = "pano.jpg";
+var defaultPicture = "bus_resized.jpg";
 var awake = new __WEBPACK_IMPORTED_MODULE_4_nosleep_js__();
 var mobile = false; // if being run on a mobile device
 var tablet = false; // if being run on a tablet
@@ -118,7 +118,6 @@ window.onload = function () {
             Array.from(document.querySelectorAll(".mobile.icon")).forEach(function (element) {
                 element.style.display = "";
             });
-            // document.getElementById("tilt").style.display = "";
             document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
             rotSetup();
             accSetup();
@@ -128,8 +127,6 @@ window.onload = function () {
             alert(initRot.join("\n"));
         });
     }
-    // General setup
-    document.querySelector("#upload").onchange = uploadPhoto;
     // Get a canvas of some sort, e.g. fullscreen or embedded in a site
     var canvas = createCanvas({
         canvas: document.querySelector('#canvas'),
@@ -170,6 +167,8 @@ window.onload = function () {
                 autoSpinning(dt);
             }
         });
+        // General setup
+        document.querySelector("#upload").onchange = uploadPhoto;
         // Handle automatic scrolling
         function autoSpinning(dt) {
             dt = dt < 20 ? dt : 16.8; // Makes sure dt doesn't become too high
@@ -239,17 +238,20 @@ window.onload = function () {
                 }
             });
         }
-    };
-    // Sets the uploaded image to be viewed
-    function uploadPhoto() {
-        if (this.files && this.files[0]) {
-            image.src = URL.createObjectURL(this.files[0]); // set src to file url
-            // To be deleted
-            alert(this.files[0]);
-            alert(URL.createObjectURL(this.files[0]));
-            this.files = null;
+        // Sets the uploaded image to be viewed
+        function uploadPhoto() {
+            if (this.files && this.files[0]) {
+                var img_1 = new Image();
+                img_1.onload = function () {
+                    viewer.texture(img_1);
+                };
+                img_1.onerror = function () {
+                    alert('Could not load image!');
+                };
+                img_1.crossOrigin = 'Anonymous';
+            }
         }
-    }
+    };
 };
 // Utility to create a device pixel scaled canvas
 function createCanvas(opt) {
@@ -320,8 +322,8 @@ function viewerSetup(viewer) {
     // document.getElementById("toggle").onclick = toggleSpin;
     // Set up button handlers
     document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin").onclick = toggleSpin;
-    if (mobile)
-        document.querySelector("#tilt").onclick = toggleTilt;
+    mobile ? document.querySelector("#tilt").onclick = toggleTilt
+        : document.querySelector("#invert").onclick = invertDrag;
     document.querySelector("#left").onclick = moveLeft;
     document.querySelector("#right").onclick = moveRight;
     // Calls helper methods based on which keys pressed
@@ -398,12 +400,6 @@ function shiftOn() {
 function shiftOff() {
     shift = false;
 }
-// Toggles auto spin triggered by a keypress
-// function toggleSpinKeyDown() {
-// (<HTMLInputElement>document.getElementById("toggle")).checked =
-//   !(<HTMLInputElement>document.getElementById("toggle")).checked;
-//   toggleSpin();
-// }
 // Toggles auto spin
 function toggleSpin() {
     autoSpin = !autoSpin;

@@ -8,7 +8,7 @@ import * as noSleep from 'nosleep.js';
 
 const decimalDigits = 3;    // number of decimal places to round values
 const imagePath = "../../assets/imgs/"
-const defaultPicture = "pano.jpg"
+const defaultPicture = "bus_resized.jpg"
 const awake = new noSleep();
 
 let mobile = false;         // if being run on a mobile device
@@ -62,7 +62,6 @@ window.onload = () => {
       Array.from(document.querySelectorAll(".mobile.icon")).forEach(element => {
         (<HTMLElement>element).style.display = "";
       });
-      // document.getElementById("tilt").style.display = "";
       document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
       rotSetup();
       accSetup();
@@ -72,10 +71,8 @@ window.onload = () => {
     document.getElementsByClassName("display")[0].addEventListener("click", () => {
       alert(initRot.join("\n"));
     });
-
   }
-  // General setup
-  (<HTMLElement>document.querySelector("#upload")).onchange = uploadPhoto;
+  
   
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
   const canvas = createCanvas({
@@ -121,6 +118,9 @@ window.onload = () => {
         autoSpinning(dt);
       }
     });
+
+    // General setup
+    (<HTMLElement>document.querySelector("#upload")).onchange = uploadPhoto;
 
     // Handle automatic scrolling
     function autoSpinning(dt) {
@@ -185,7 +185,7 @@ window.onload = () => {
           (<HTMLDivElement>dropRegion).style.display = 'none';
         },
         onDrop: (files) => {
-          var img = new Image();
+          let img = new Image();
           img.onload = () => {
             viewer.texture(img);
           };
@@ -197,18 +197,21 @@ window.onload = () => {
         }
       });
     }
-  };
 
-  // Sets the uploaded image to be viewed
-  function uploadPhoto() {
-    if (this.files && this.files[0]) {
-        image.src = URL.createObjectURL(this.files[0]); // set src to file url
-        // To be deleted
-        alert(this.files[0])
-        alert(URL.createObjectURL(this.files[0]))
-        this.files = null
+    // Sets the uploaded image to be viewed
+    function uploadPhoto() {
+      if (this.files && this.files[0]) {
+        let img = new Image();
+        img.onload = () => {
+          viewer.texture(img);
+        };
+        img.onerror = () => {
+          alert('Could not load image!');
+        };
+        img.crossOrigin = 'Anonymous';
+      }
     }
-  }
+  };
 
 }
 
@@ -293,7 +296,8 @@ function viewerSetup(viewer) {
 
   // Set up button handlers
   (<HTMLImageElement>document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin")).onclick = toggleSpin;
-  if (mobile) (<HTMLImageElement>document.querySelector("#tilt")).onclick = toggleTilt;
+  mobile ? (<HTMLImageElement>document.querySelector("#tilt")).onclick = toggleTilt
+         : (<HTMLImageElement>document.querySelector("#invert")).onclick = invertDrag;
   (<HTMLImageElement>document.querySelector("#left")).onclick = moveLeft;
   (<HTMLImageElement>document.querySelector("#right")).onclick = moveRight;
 
@@ -364,13 +368,6 @@ function shiftOn() {
 function shiftOff() {
   shift = false;
 }
-
-// Toggles auto spin triggered by a keypress
-// function toggleSpinKeyDown() {
-  // (<HTMLInputElement>document.getElementById("toggle")).checked =
-  //   !(<HTMLInputElement>document.getElementById("toggle")).checked;
-//   toggleSpin();
-// }
 
 // Toggles auto spin
 function toggleSpin() {
