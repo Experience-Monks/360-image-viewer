@@ -209,6 +209,7 @@ window.onload = () => {
           alert('Could not load image!');
         };
         img.crossOrigin = 'Anonymous';
+        image.src = URL.createObjectURL(this.files[0]);
       }
     }
   };
