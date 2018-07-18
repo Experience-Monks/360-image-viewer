@@ -43,10 +43,12 @@ webpackEmptyAsyncContext.id = 161;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_360_image_viewer__ = __webpack_require__(284);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_360_image_viewer___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_360_image_viewer__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_drag_drop__ = __webpack_require__(330);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_drag_drop___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_drag_drop__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_nosleep_js__ = __webpack_require__(333);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_nosleep_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_nosleep_js__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize__ = __webpack_require__(335);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_drag_drop__ = __webpack_require__(330);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_drag_drop___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_drag_drop__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_nosleep_js__ = __webpack_require__(333);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_nosleep_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_nosleep_js__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -62,10 +64,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var decimalDigits = 3; // number of decimal places to round values
+
+var decimalDigits = 3; // To be deleted   // number of decimal places to round values
 var imagePath = "../../assets/imgs/";
-var defaultPicture = "bus_resized.jpg";
-var awake = new __WEBPACK_IMPORTED_MODULE_4_nosleep_js__();
+var defaultPicture = "pano.jpg";
+var awake = new __WEBPACK_IMPORTED_MODULE_5_nosleep_js__();
+var maxTextureSize = __WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize__();
+// const maxTextureSize = 4096;
 var mobile = false; // if being run on a mobile device
 var tablet = false; // if being run on a tablet
 var autoSpin = false; // whether to rotate the view
@@ -91,6 +96,7 @@ var HomePage = /** @class */ (function () {
             tablet = this.platform.is('tablet');
         scalingFactors = mobile ? [0.00003, 0.00003]
             : [0.000065, 0.000050];
+        alert(maxTextureSize);
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
@@ -203,8 +209,8 @@ window.onload = function () {
                 if (portrait < 3)
                     xdiff = -xdiff;
             }
-            viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0]; // (canvasSize[0] / 4);
-            viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1]; // (canvasSize[1] / 4);
+            viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0];
+            viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1];
             // To be deleted
             rotSpeed = [0, ydiff, xdiff];
             document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
@@ -218,7 +224,7 @@ window.onload = function () {
         // Setup drag and drop for uploading new photos on desktop
         function setupDragDrop(canvas, viewer) {
             var dropRegion = document.querySelector('#drop-region');
-            __WEBPACK_IMPORTED_MODULE_3_drag_drop__(canvas, {
+            __WEBPACK_IMPORTED_MODULE_4_drag_drop__(canvas, {
                 onDragEnter: function () {
                     dropRegion.style.display = '';
                 },
@@ -243,12 +249,44 @@ window.onload = function () {
             if (this.files && this.files[0]) {
                 var img_1 = new Image();
                 img_1.onload = function () {
-                    viewer.texture(img_1);
+                    // To be deleted
+                    // alert("This image width: " + img.width + ", height: " + img.height);
+                    if (img_1.width > maxTextureSize || img_1.height > maxTextureSize) {
+                        resizeImg(img_1);
+                    }
+                    else {
+                        viewer.texture(img_1);
+                    }
                 };
                 img_1.onerror = function () {
                     alert('Could not load image!');
                 };
                 img_1.crossOrigin = 'Anonymous';
+                img_1.src = URL.createObjectURL(this.files[0]);
+            }
+        }
+        // returns a URL to an image of img resized to maxTextureSize
+        function resizeImg(img) {
+            alert("resizing!");
+            var cvs = document.createElement("canvas");
+            var ctx = cvs.getContext("2d");
+            var scalingFactor = 1;
+            if (img.width > maxTextureSize || img.height > maxTextureSize) {
+                if (img.width >= img.height) {
+                    // To be deleted
+                    // alert("too wide! width: " + img.width + ", height: " + img.height);
+                    scalingFactor = maxTextureSize / img.width;
+                }
+                else {
+                    // To be deleted
+                    // alert("too tall! width: " + img.width + ", height: " + img.height);
+                    scalingFactor = maxTextureSize / img.height;
+                }
+                cvs.width = img.width * scalingFactor;
+                cvs.height = img.height * scalingFactor;
+                ctx.scale(scalingFactor, scalingFactor);
+                ctx.drawImage(img, 0, 0);
+                img.src = cvs.toDataURL();
             }
         }
     };
@@ -580,6 +618,20 @@ var MyApp = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=app.component.js.map
+
+/***/ }),
+
+/***/ 335:
+/***/ (function(module, exports, __webpack_require__) {
+
+const getContext = __webpack_require__(336);
+const DEFAULT_SIZE = 1024;
+
+module.exports = function () {
+  const gl = getContext('webgl');
+  return gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : DEFAULT_SIZE;
+};
+
 
 /***/ })
 

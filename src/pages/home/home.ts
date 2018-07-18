@@ -3,13 +3,16 @@ import { NavController } from 'ionic-angular';
 import { Platform } from 'ionic-angular';
 
 import * as create360Viewer from '360-image-viewer';
+import * as getMaxTextureSize from './getMaxTextureSize';
 import * as dragDrop from 'drag-drop';
 import * as noSleep from 'nosleep.js';
 
-const decimalDigits = 3;    // number of decimal places to round values
+const decimalDigits = 3;    // To be deleted   // number of decimal places to round values
 const imagePath = "../../assets/imgs/"
-const defaultPicture = "bus_resized.jpg"
+const defaultPicture = "pano.jpg"
 const awake = new noSleep();
+const maxTextureSize = getMaxTextureSize();
+// const maxTextureSize = 4096;
 
 let mobile = false;         // if being run on a mobile device
 let tablet = false;         // if being run on a tablet
@@ -42,6 +45,7 @@ export class HomePage {
     if (mobile) tablet = this.platform.is('tablet');
     scalingFactors = mobile ? [0.00003, 0.00003]
                             : [0.000065, 0.000050]
+    alert(maxTextureSize)
   }
 }
 window.onload = () => {
@@ -82,7 +86,7 @@ window.onload = () => {
   // Create and set up image
   const image = new Image();
   image.src = imagePath + defaultPicture;
-
+  
   image.onload = () => {
     // Setup the 360 viewer
     const viewer = create360Viewer({
@@ -160,8 +164,8 @@ window.onload = () => {
           xdiff = -xdiff;
       }
 
-      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0] // (canvasSize[0] / 4);
-      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1] // (canvasSize[1] / 4);
+      viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0];
+      viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1];
       // To be deleted
       rotSpeed = [0, ydiff, xdiff];
       document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
@@ -203,17 +207,46 @@ window.onload = () => {
       if (this.files && this.files[0]) {
         let img = new Image();
         img.onload = () => {
-          viewer.texture(img);
+          // To be deleted
+          // alert("This image width: " + img.width + ", height: " + img.height);
+          if (img.width > maxTextureSize || img.height > maxTextureSize) {
+            resizeImg(img);
+          } else {
+            viewer.texture(img);
+          }
         };
         img.onerror = () => {
           alert('Could not load image!');
         };
         img.crossOrigin = 'Anonymous';
-        image.src = URL.createObjectURL(this.files[0]);
+        img.src = URL.createObjectURL(this.files[0]);
+      }
+    }
+
+    // returns a URL to an image of img resized to maxTextureSize
+    function resizeImg(img) {
+      alert("resizing!")
+      let cvs = document.createElement("canvas");
+      let ctx = cvs.getContext("2d");
+      let scalingFactor = 1
+      if (img.width > maxTextureSize || img.height > maxTextureSize) {	
+        if (img.width >= img.height) {
+            // To be deleted
+            // alert("too wide! width: " + img.width + ", height: " + img.height);
+            scalingFactor = maxTextureSize / img.width
+        } else {
+            // To be deleted
+            // alert("too tall! width: " + img.width + ", height: " + img.height);
+            scalingFactor = maxTextureSize / img.height
+        }
+        cvs.width = img.width * scalingFactor;
+        cvs.height = img.height * scalingFactor;
+        ctx.scale(scalingFactor, scalingFactor);
+        ctx.drawImage(img, 0, 0);
+        img.src = cvs.toDataURL()
       }
     }
   };
-
 }
 
 
