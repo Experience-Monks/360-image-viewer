@@ -7,9 +7,9 @@ import * as getMaxTextureSize from './getMaxTextureSize';
 import * as dragDrop from 'drag-drop';
 import * as noSleep from 'nosleep.js';
 
-const decimalDigits = 3;    // To be deleted   // number of decimal places to round values
+const decimalDigits = 3;    // number of decimal places to round values
 const imagePath = "../../assets/imgs/"
-const defaultPicture = "pano.jpg"
+const defaultPicture = "pano_7000.jpg"
 const awake = new noSleep();
 const maxTextureSize = getMaxTextureSize();
 
@@ -23,14 +23,12 @@ let scalingFactors;         // holds scaling factors
 
 let initMouse = [0, 0]      // initial cursor position
 let currMouse = [0, 0]      // current cursor position
-let currPos = [0, 0]        // current position
 
 let portrait = 0;           // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
 let canvasSize = [0, 0]     // current canvas size
 let currAcc = [0, 0, 0]     // current acceleration
 let initRot = [0, 0, 0]     // current rotation
 let currRot = [0, 0, 0]     // current rotation
-let rotSpeed = [0, 0, 0]    // movement in each axis (To be deleted)
 
 @Component({
   selector: 'page-home',
@@ -43,7 +41,6 @@ export class HomePage {
     if (mobile) tablet = this.platform.is('tablet');
     scalingFactors = mobile ? [0.00003, 0.00003]
                             : [0.000065, 0.000050]
-    // alert(maxTextureSize)
   }
 }
 window.onload = () => {
@@ -52,10 +49,8 @@ window.onload = () => {
     Array.from(document.querySelectorAll(".desktop.icon")).forEach(element => {
       (<HTMLElement>element).style.display = "";
     });
-    mouseSetup();
-    
-    // To be deleted
     (<HTMLElement>document.querySelector(".right.info")).style.display = "";
+    mouseSetup();
   }
   // Mobile browser setup
   else {
@@ -63,19 +58,11 @@ window.onload = () => {
     if ("ondeviceorientation" in window) {
       Array.from(document.querySelectorAll(".mobile.icon")).forEach(element => {
         (<HTMLElement>element).style.display = "";
-        // (<HTMLElement>element).addEventListener("click", );
       });
-      // document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
       rotSetup();
       accSetup();
     }
-
-    // To be deleted
-    document.getElementsByClassName("display")[0].addEventListener("click", () => {
-      alert(initRot.join("\n"));
-    });
   }
-  
   
   // Get a canvas of some sort, e.g. fullscreen or embedded in a site
   const canvas = createCanvas({
@@ -87,6 +74,10 @@ window.onload = () => {
   image.src = imagePath + defaultPicture;
   
   image.onload = () => {
+    // Resize default image if necessary
+    if (resizeImg(image))
+      return
+    
     // Setup the 360 viewer
     const viewer = create360Viewer({
       image: image,
@@ -105,14 +96,6 @@ window.onload = () => {
     viewer.start();
 
     viewer.on('tick', (dt) => {
-      // To be deleted
-      if (!mobile) {
-        let theta = roundDecimal(viewer.controls.theta, decimalDigits);
-        let phi = roundDecimal(viewer.controls.phi, decimalDigits);
-        currPos = [theta, phi];
-        document.getElementById("position").innerHTML = "<p>" + currPos.join("</p><p>") + "</p>";
-      }
-
       if (shift && !mobile) {
         cursorScrolling();
       } else if (tilt && mobile && !viewer.controls.dragging) {
@@ -165,9 +148,6 @@ window.onload = () => {
 
       viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0];
       viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1];
-      // To be deleted
-      rotSpeed = [0, ydiff, xdiff];
-      document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
     }
 
     // returns the smallest angle difference between init and curr within the range [-deg, deg]
@@ -206,13 +186,9 @@ window.onload = () => {
       if (this.files && this.files[0]) {
         let img = new Image();
         img.onload = () => {
-          // To be deleted
-          // alert("This image width: " + img.width + ", height: " + img.height);
-          if (img.width > maxTextureSize || img.height > maxTextureSize) {
-            resizeImg(img);
-          } else {
-            viewer.texture(img);
-          }
+          if (resizeImg(img))
+            return;
+          viewer.texture(img);
         };
         img.onerror = () => {
           alert('Could not load image!');
@@ -228,8 +204,6 @@ window.onload = () => {
     function resizeImg(img) {
       if (img.width > maxTextureSize || img.height > maxTextureSize) {	
         alert("Resizing image to fit screen.")
-            // To be deleted
-        // alert("width: " + img.width + ", height: " + img.height); 
         let cvs = document.createElement("canvas");
         let ctx = cvs.getContext("2d");
         let scalingFactor = maxTextureSize / (img.width >= img.height ? img.width : img.height);
@@ -238,12 +212,12 @@ window.onload = () => {
         ctx.scale(scalingFactor, scalingFactor);
         ctx.drawImage(img, 0, 0);
         img.src = cvs.toDataURL()
+        return true;
       }
+      return false;
     }
   };
 }
-
-
 
 // Utility to create a device pixel scaled canvas
 function createCanvas(opt = <any>{}) {
@@ -288,22 +262,6 @@ function createCanvas(opt = <any>{}) {
     setupGrabCursor();
   return canvas;
 }
-
-// Prevents the screen from going to sleep on mobile
-// function enableNoSleep() {
-  // awake.enable();
-  // alert("no more sleeping")
-  // document.getElementById("tilt").removeEventListener('click', enableNoSleep);
-  // document.getElementById("spin").removeEventListener('click', enableNoSleep);
-// }
-
-// Prevents the screen from going to sleep on mobile
-// function disableNoSleep() {
-  // awake.disable();
-  // alert("no more sleeping")
-  // document.getElementById("tilt").addEventListener('click', enableNoSleep);
-  // document.getElementById("spin").addEventListener('click', enableNoSleep);
-// }
 
 // Calculates the orientation of the mobile device
 function recalculateOrientation() {
@@ -412,15 +370,13 @@ function toggleSpin() {
                    (mobile ? ".mobile" : ".desktop") + ".icon#spin");
   spinButton.src = imagePath + (autoSpin ? "stop.png" : "rotate.png");
   if (autoSpin) {
-    // alert("enabling nosleep")
     awake.enable();
   } else if (mobile && !autoSpin && !tilt) {
-    // alert("disabling nosleep")
     awake.disable();
   }
 }
 
-// Toggles the tilt controls, sets the HTML button text
+// Toggles the tilt controls
 function toggleTilt() {
   if (autoSpin) toggleSpin();
 
@@ -429,13 +385,11 @@ function toggleTilt() {
   if (tilt) {
     tiltButton.src = imagePath + "iphone.png";
     initRot = currRot;
-    // alert("enabling nosleep")
     awake.enable();
   } else {
     tiltButton.src = imagePath + "tilt.png";
   }
   if (mobile && !autoSpin && !tilt) {
-    // alert("disabling nosleep")
     awake.disable();
   }
 }
@@ -458,8 +412,6 @@ function rotSetup() {
     let beta = roundDecimal(e.beta, decimalDigits);
     let gamma = roundDecimal(e.gamma, decimalDigits);
     currRot = [alpha, beta, gamma];
-    // To be deleted
-    document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
   })
 }
 
@@ -471,8 +423,6 @@ function accSetup() {
     let yAcc = roundDecimal(e.accelerationIncludingGravity.y, decimalDigits);
     let zAcc = roundDecimal(e.accelerationIncludingGravity.z, decimalDigits);
     currAcc = [xAcc, yAcc, zAcc];
-    // To be deleted
-    // document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
   })
 }
 

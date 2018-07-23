@@ -65,9 +65,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var decimalDigits = 3; // To be deleted   // number of decimal places to round values
+var decimalDigits = 3; // number of decimal places to round values
 var imagePath = "../../assets/imgs/";
-var defaultPicture = "pano.jpg";
+var defaultPicture = "pano_7000.jpg";
 var awake = new __WEBPACK_IMPORTED_MODULE_5_nosleep_js__();
 var maxTextureSize = __WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize__();
 var mobile = false; // if being run on a mobile device
@@ -79,13 +79,11 @@ var tilt = false; // if mobile is in tilt mode
 var scalingFactors; // holds scaling factors
 var initMouse = [0, 0]; // initial cursor position
 var currMouse = [0, 0]; // current cursor position
-var currPos = [0, 0]; // current position
 var portrait = 0; // orientation of phone (0-vertical, 1-cw, 2-upside down, 3-ccw)
 var canvasSize = [0, 0]; // current canvas size
 var currAcc = [0, 0, 0]; // current acceleration
 var initRot = [0, 0, 0]; // current rotation
 var currRot = [0, 0, 0]; // current rotation
-var rotSpeed = [0, 0, 0]; // movement in each axis (To be deleted)
 var HomePage = /** @class */ (function () {
     function HomePage(navCtrl, platform) {
         this.navCtrl = navCtrl;
@@ -95,15 +93,15 @@ var HomePage = /** @class */ (function () {
             tablet = this.platform.is('tablet');
         scalingFactors = mobile ? [0.00003, 0.00003]
             : [0.000065, 0.000050];
-        // alert(maxTextureSize)
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n</head>\n\n<body>\n  <canvas id="canvas"></canvas>\n\n  <!-- To be deleted -->\n  <div class="left display">\n    <p id="position"></p>\n  </div>\n  <div class="right display">\n    <p id="position2"></p>\n  </div>\n\n  <img class="left arrow" id="left" src="../../assets/imgs/left.png">\n  <img class="right arrow" id="right" src="../../assets/imgs/right.png">\n  \n  <div class="left info">\n    <ul>\n      <li>\n        <img class="desktop icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n        <img class="mobile icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none">\n      </li>\n      <li>\n        <img class="desktop icon" id="invert" src="../../assets/imgs/invert.png" style="display: none">\n        <img class="mobile icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n      </li>\n      <li>\n        <label for="upload">\n            <img class="icon" src="../../assets/imgs/upload.png"> </label>\n          <input id="upload" type="file" style="display: none">\n        </li>\n    </ul>\n\n\n    <!-- <div class="hr"></div> -->\n    <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n    <!-- <label for="upload">\n      <img class="icon" src="../../assets/imgs/upload.png"> </label>\n    <input id="upload" type="file" style="display: none">\n    \n    <img class="icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n    <img class="icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none"> -->\n    <!-- <button id="tilt" style="display: none">Tilt</button> -->\n    <!-- <div class="hr"></div> -->\n    <!-- <p class="controls" style="display:none">Automatic scrolling\n      <input type="checkbox" id="toggle">\n    </p>\n    <p class="controls" style="display:none">Invert Drag Controls\n      <input type="checkbox" id="invert">\n    </p> -->\n  </div>\n  <div class="right info" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n\n</html>'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n</head>\n\n<body>\n  <canvas id="canvas"></canvas>\n  <img class="left arrow" id="left" src="../../assets/imgs/left.png">\n  <img class="right arrow" id="right" src="../../assets/imgs/right.png">\n  \n  <div class="left info">\n    <ul>\n      <li>\n        <img class="desktop icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n        <img class="mobile icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none">\n      </li>\n      <li>\n        <img class="desktop icon" id="invert" src="../../assets/imgs/invert.png" style="display: none">\n        <img class="mobile icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n      </li>\n      <li>\n        <label for="upload">\n            <img class="icon" src="../../assets/imgs/upload.png"> </label>\n          <input id="upload" type="file" style="display: none">\n        </li>\n    </ul>\n  </div>\n\n  <div class="right info" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n\n  <div id="drop-region" style="display: none"></div>\n  \n  <script src="bundle.js"></script>\n</body>\n\n</html>'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]) === "function" && _b || Object])
     ], HomePage);
     return HomePage;
+    var _a, _b;
 }());
 
 window.onload = function () {
@@ -112,25 +110,18 @@ window.onload = function () {
         Array.from(document.querySelectorAll(".desktop.icon")).forEach(function (element) {
             element.style.display = "";
         });
-        mouseSetup();
-        // To be deleted
         document.querySelector(".right.info").style.display = "";
+        mouseSetup();
     }
     else {
         // Set up tilt controls if supported
         if ("ondeviceorientation" in window) {
             Array.from(document.querySelectorAll(".mobile.icon")).forEach(function (element) {
                 element.style.display = "";
-                // (<HTMLElement>element).addEventListener("click", );
             });
-            // document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
             rotSetup();
             accSetup();
         }
-        // To be deleted
-        document.getElementsByClassName("display")[0].addEventListener("click", function () {
-            alert(initRot.join("\n"));
-        });
     }
     // Get a canvas of some sort, e.g. fullscreen or embedded in a site
     var canvas = createCanvas({
@@ -140,6 +131,9 @@ window.onload = function () {
     var image = new Image();
     image.src = imagePath + defaultPicture;
     image.onload = function () {
+        // Resize default image if necessary
+        if (resizeImg(image))
+            return;
         // Setup the 360 viewer
         var viewer = __WEBPACK_IMPORTED_MODULE_2_360_image_viewer__({
             image: image,
@@ -155,13 +149,6 @@ window.onload = function () {
         viewerSetup(viewer);
         viewer.start();
         viewer.on('tick', function (dt) {
-            // To be deleted
-            if (!mobile) {
-                var theta = roundDecimal(viewer.controls.theta, decimalDigits);
-                var phi = roundDecimal(viewer.controls.phi, decimalDigits);
-                currPos = [theta, phi];
-                document.getElementById("position").innerHTML = "<p>" + currPos.join("</p><p>") + "</p>";
-            }
             if (shift && !mobile) {
                 cursorScrolling();
             }
@@ -210,9 +197,6 @@ window.onload = function () {
             }
             viewer.controls.theta += Math.sign(xdiff) * Math.pow(xdiff, 2) * scalingFactors[0];
             viewer.controls.phi += Math.sign(ydiff) * Math.pow(ydiff, 2) * scalingFactors[1];
-            // To be deleted
-            rotSpeed = [0, ydiff, xdiff];
-            document.getElementById("position2").innerHTML = "<p>" + rotSpeed.join("</p><p>") + "</p>";
         }
         // returns the smallest angle difference between init and curr within the range [-deg, deg]
         function smallestDiff(init, curr, deg) {
@@ -248,14 +232,9 @@ window.onload = function () {
             if (this.files && this.files[0]) {
                 var img_1 = new Image();
                 img_1.onload = function () {
-                    // To be deleted
-                    // alert("This image width: " + img.width + ", height: " + img.height);
-                    if (img_1.width > maxTextureSize || img_1.height > maxTextureSize) {
-                        resizeImg(img_1);
-                    }
-                    else {
-                        viewer.texture(img_1);
-                    }
+                    if (resizeImg(img_1))
+                        return;
+                    viewer.texture(img_1);
                 };
                 img_1.onerror = function () {
                     alert('Could not load image!');
@@ -272,8 +251,6 @@ window.onload = function () {
         function resizeImg(img) {
             if (img.width > maxTextureSize || img.height > maxTextureSize) {
                 alert("Resizing image to fit screen.");
-                // To be deleted
-                // alert("width: " + img.width + ", height: " + img.height); 
                 var cvs = document.createElement("canvas");
                 var ctx = cvs.getContext("2d");
                 var scalingFactor = maxTextureSize / (img.width >= img.height ? img.width : img.height);
@@ -282,7 +259,9 @@ window.onload = function () {
                 ctx.scale(scalingFactor, scalingFactor);
                 ctx.drawImage(img, 0, 0);
                 img.src = cvs.toDataURL();
+                return true;
             }
+            return false;
         }
     };
 };
@@ -325,20 +304,6 @@ function createCanvas(opt) {
         setupGrabCursor();
     return canvas;
 }
-// Prevents the screen from going to sleep on mobile
-// function enableNoSleep() {
-// awake.enable();
-// alert("no more sleeping")
-// document.getElementById("tilt").removeEventListener('click', enableNoSleep);
-// document.getElementById("spin").removeEventListener('click', enableNoSleep);
-// }
-// Prevents the screen from going to sleep on mobile
-// function disableNoSleep() {
-// awake.disable();
-// alert("no more sleeping")
-// document.getElementById("tilt").addEventListener('click', enableNoSleep);
-// document.getElementById("spin").addEventListener('click', enableNoSleep);
-// }
 // Calculates the orientation of the mobile device
 function recalculateOrientation() {
     // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
@@ -447,15 +412,13 @@ function toggleSpin() {
     var spinButton = document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin");
     spinButton.src = imagePath + (autoSpin ? "stop.png" : "rotate.png");
     if (autoSpin) {
-        // alert("enabling nosleep")
         awake.enable();
     }
     else if (mobile && !autoSpin && !tilt) {
-        // alert("disabling nosleep")
         awake.disable();
     }
 }
-// Toggles the tilt controls, sets the HTML button text
+// Toggles the tilt controls
 function toggleTilt() {
     if (autoSpin)
         toggleSpin();
@@ -464,14 +427,12 @@ function toggleTilt() {
     if (tilt) {
         tiltButton.src = imagePath + "iphone.png";
         initRot = currRot;
-        // alert("enabling nosleep")
         awake.enable();
     }
     else {
         tiltButton.src = imagePath + "tilt.png";
     }
     if (mobile && !autoSpin && !tilt) {
-        // alert("disabling nosleep")
         awake.disable();
     }
 }
@@ -492,8 +453,6 @@ function rotSetup() {
         var beta = roundDecimal(e.beta, decimalDigits);
         var gamma = roundDecimal(e.gamma, decimalDigits);
         currRot = [alpha, beta, gamma];
-        // To be deleted
-        document.getElementById("position").innerHTML = "<p>" + currRot.join("</p><p>") + "</p>";
     });
 }
 // Read and cache the acceleration values
@@ -504,8 +463,6 @@ function accSetup() {
         var yAcc = roundDecimal(e.accelerationIncludingGravity.y, decimalDigits);
         var zAcc = roundDecimal(e.accelerationIncludingGravity.z, decimalDigits);
         currAcc = [xAcc, yAcc, zAcc];
-        // To be deleted
-        // document.getElementById("position").innerHTML = "<p>" + [xAcc, yAcc, zAcc].join("</p><p>") + "</p>";
     });
 }
 // Rounds num to at most dig decimal places
