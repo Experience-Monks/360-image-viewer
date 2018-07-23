@@ -43,11 +43,11 @@ webpackEmptyAsyncContext.id = 161;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_360_image_viewer__ = __webpack_require__(284);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_360_image_viewer___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_360_image_viewer__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize__ = __webpack_require__(335);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize__ = __webpack_require__(330);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_drag_drop__ = __webpack_require__(330);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_drag_drop__ = __webpack_require__(332);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_drag_drop___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_drag_drop__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_nosleep_js__ = __webpack_require__(333);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_nosleep_js__ = __webpack_require__(335);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_nosleep_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_nosleep_js__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -70,7 +70,6 @@ var imagePath = "../../assets/imgs/";
 var defaultPicture = "pano.jpg";
 var awake = new __WEBPACK_IMPORTED_MODULE_5_nosleep_js__();
 var maxTextureSize = __WEBPACK_IMPORTED_MODULE_3__getMaxTextureSize__();
-// const maxTextureSize = 4096;
 var mobile = false; // if being run on a mobile device
 var tablet = false; // if being run on a tablet
 var autoSpin = false; // whether to rotate the view
@@ -96,16 +95,15 @@ var HomePage = /** @class */ (function () {
             tablet = this.platform.is('tablet');
         scalingFactors = mobile ? [0.00003, 0.00003]
             : [0.000065, 0.000050];
-        alert(maxTextureSize);
+        // alert(maxTextureSize)
     }
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-home',template:/*ion-inline-start:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/'<!DOCTYPE html>\n<html lang="en">\n\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">\n  <title>My 360-image-viewer</title>\n  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">\n</head>\n\n<body>\n  <canvas id="canvas"></canvas>\n\n  <!-- To be deleted -->\n  <div class="left display">\n    <p id="position"></p>\n  </div>\n  <div class="right display">\n    <p id="position2"></p>\n  </div>\n\n  <img class="left arrow" id="left" src="../../assets/imgs/left.png">\n  <img class="right arrow" id="right" src="../../assets/imgs/right.png">\n  \n  <div class="left info">\n    <ul>\n      <li>\n        <img class="desktop icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n        <img class="mobile icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none">\n      </li>\n      <li>\n        <img class="desktop icon" id="invert" src="../../assets/imgs/invert.png" style="display: none">\n        <img class="mobile icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n      </li>\n      <li>\n        <label for="upload">\n            <img class="icon" src="../../assets/imgs/upload.png"> </label>\n          <input id="upload" type="file" style="display: none">\n        </li>\n    </ul>\n\n\n    <!-- <div class="hr"></div> -->\n    <!-- <p>Drop an equirectangular JPG or PNG here to view it in 360º</p> -->\n    <!-- <label for="upload">\n      <img class="icon" src="../../assets/imgs/upload.png"> </label>\n    <input id="upload" type="file" style="display: none">\n    \n    <img class="icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">\n    <img class="icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none"> -->\n    <!-- <button id="tilt" style="display: none">Tilt</button> -->\n    <!-- <div class="hr"></div> -->\n    <!-- <p class="controls" style="display:none">Automatic scrolling\n      <input type="checkbox" id="toggle">\n    </p>\n    <p class="controls" style="display:none">Invert Drag Controls\n      <input type="checkbox" id="invert">\n    </p> -->\n  </div>\n  <div class="right info" style="display: none">\n    <div class="hr"></div>\n    <p>Press SPACE to toggle auto spin</p>\n    <p>Use the ARROW KEYS to move around</p>\n    <p>Hold SHIFT and move the cursor to pan around</p>\n  </div>\n  <div id="drop-region" style="display: none"></div>\n  <script src="bundle.js"></script>\n</body>\n\n</html>'/*ion-inline-end:"/Users/william/Documents/GitHub/my360-image-viewer/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]) === "function" && _b || Object])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["d" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* Platform */]])
     ], HomePage);
     return HomePage;
-    var _a, _b;
 }());
 
 window.onload = function () {
@@ -123,8 +121,9 @@ window.onload = function () {
         if ("ondeviceorientation" in window) {
             Array.from(document.querySelectorAll(".mobile.icon")).forEach(function (element) {
                 element.style.display = "";
+                // (<HTMLElement>element).addEventListener("click", );
             });
-            document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
+            // document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
             rotSetup();
             accSetup();
         }
@@ -264,24 +263,20 @@ window.onload = function () {
                 img_1.crossOrigin = 'Anonymous';
                 img_1.src = URL.createObjectURL(this.files[0]);
             }
+            if (tilt)
+                toggleTilt();
+            if (autoSpin)
+                toggleSpin();
         }
         // returns a URL to an image of img resized to maxTextureSize
         function resizeImg(img) {
-            alert("resizing!");
-            var cvs = document.createElement("canvas");
-            var ctx = cvs.getContext("2d");
-            var scalingFactor = 1;
             if (img.width > maxTextureSize || img.height > maxTextureSize) {
-                if (img.width >= img.height) {
-                    // To be deleted
-                    // alert("too wide! width: " + img.width + ", height: " + img.height);
-                    scalingFactor = maxTextureSize / img.width;
-                }
-                else {
-                    // To be deleted
-                    // alert("too tall! width: " + img.width + ", height: " + img.height);
-                    scalingFactor = maxTextureSize / img.height;
-                }
+                alert("Resizing image to fit screen.");
+                // To be deleted
+                // alert("width: " + img.width + ", height: " + img.height); 
+                var cvs = document.createElement("canvas");
+                var ctx = cvs.getContext("2d");
+                var scalingFactor = maxTextureSize / (img.width >= img.height ? img.width : img.height);
                 cvs.width = img.width * scalingFactor;
                 cvs.height = img.height * scalingFactor;
                 ctx.scale(scalingFactor, scalingFactor);
@@ -331,16 +326,25 @@ function createCanvas(opt) {
     return canvas;
 }
 // Prevents the screen from going to sleep on mobile
-function enableNoSleep() {
-    awake.enable();
-    // alert("no more sleeping")
-    document.getElementById("tilt").removeEventListener('click', enableNoSleep);
-}
+// function enableNoSleep() {
+// awake.enable();
+// alert("no more sleeping")
+// document.getElementById("tilt").removeEventListener('click', enableNoSleep);
+// document.getElementById("spin").removeEventListener('click', enableNoSleep);
+// }
+// Prevents the screen from going to sleep on mobile
+// function disableNoSleep() {
+// awake.disable();
+// alert("no more sleeping")
+// document.getElementById("tilt").addEventListener('click', enableNoSleep);
+// document.getElementById("spin").addEventListener('click', enableNoSleep);
+// }
 // Calculates the orientation of the mobile device
 function recalculateOrientation() {
     // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
     portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] >= 0 ? 0 : 2)
         : (currAcc[0] >= 0 ? 3 : 1);
+    // workaround for the horizontal SONY tablet
     if (tablet)
         portrait = (portrait + 1) % 4;
     if (tilt)
@@ -355,9 +359,6 @@ function viewerSetup(viewer) {
         document.body.onkeydown = checkKeyDown;
         document.body.onkeyup = checkKeyUp;
     }
-    // Set up checkbox handlers
-    // document.getElementById("invert").onclick = invertDrag;
-    // document.getElementById("toggle").onclick = toggleSpin;
     // Set up button handlers
     document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin").onclick = toggleSpin;
     mobile ? document.querySelector("#tilt").onclick = toggleTilt
@@ -440,22 +441,38 @@ function shiftOff() {
 }
 // Toggles auto spin
 function toggleSpin() {
+    if (tilt)
+        toggleTilt();
     autoSpin = !autoSpin;
     var spinButton = document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin");
     spinButton.src = imagePath + (autoSpin ? "stop.png" : "rotate.png");
+    if (autoSpin) {
+        // alert("enabling nosleep")
+        awake.enable();
+    }
+    else if (mobile && !autoSpin && !tilt) {
+        // alert("disabling nosleep")
+        awake.disable();
+    }
 }
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
+    if (autoSpin)
+        toggleSpin();
     tilt = !tilt;
     var tiltButton = document.querySelector("#tilt");
     if (tilt) {
         tiltButton.src = imagePath + "iphone.png";
         initRot = currRot;
+        // alert("enabling nosleep")
+        awake.enable();
     }
     else {
         tiltButton.src = imagePath + "tilt.png";
+    }
+    if (mobile && !autoSpin && !tilt) {
+        // alert("disabling nosleep")
         awake.disable();
-        tiltButton.addEventListener('click', enableNoSleep);
     }
 }
 // Read and cache mouse position
@@ -621,10 +638,10 @@ var MyApp = /** @class */ (function () {
 
 /***/ }),
 
-/***/ 335:
+/***/ 330:
 /***/ (function(module, exports, __webpack_require__) {
 
-const getContext = __webpack_require__(336);
+const getContext = __webpack_require__(331);
 const DEFAULT_SIZE = 1024;
 
 module.exports = function () {

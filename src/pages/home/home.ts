@@ -12,7 +12,6 @@ const imagePath = "../../assets/imgs/"
 const defaultPicture = "pano.jpg"
 const awake = new noSleep();
 const maxTextureSize = getMaxTextureSize();
-// const maxTextureSize = 4096;
 
 let mobile = false;         // if being run on a mobile device
 let tablet = false;         // if being run on a tablet
@@ -38,14 +37,13 @@ let rotSpeed = [0, 0, 0]    // movement in each axis (To be deleted)
   templateUrl: 'home.html'
 })
 
-
 export class HomePage {
   constructor(public navCtrl: NavController, public platform: Platform) {
     mobile = this.platform.is('mobileweb');
     if (mobile) tablet = this.platform.is('tablet');
     scalingFactors = mobile ? [0.00003, 0.00003]
                             : [0.000065, 0.000050]
-    alert(maxTextureSize)
+    // alert(maxTextureSize)
   }
 }
 window.onload = () => {
@@ -65,8 +63,9 @@ window.onload = () => {
     if ("ondeviceorientation" in window) {
       Array.from(document.querySelectorAll(".mobile.icon")).forEach(element => {
         (<HTMLElement>element).style.display = "";
+        // (<HTMLElement>element).addEventListener("click", );
       });
-      document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
+      // document.querySelector(".mobile.icon#tilt").addEventListener("click", enableNoSleep);
       rotSetup();
       accSetup();
     }
@@ -221,24 +220,19 @@ window.onload = () => {
         img.crossOrigin = 'Anonymous';
         img.src = URL.createObjectURL(this.files[0]);
       }
+      if (tilt) toggleTilt();
+      if (autoSpin) toggleSpin();
     }
 
     // returns a URL to an image of img resized to maxTextureSize
     function resizeImg(img) {
-      alert("resizing!")
-      let cvs = document.createElement("canvas");
-      let ctx = cvs.getContext("2d");
-      let scalingFactor = 1
       if (img.width > maxTextureSize || img.height > maxTextureSize) {	
-        if (img.width >= img.height) {
+        alert("Resizing image to fit screen.")
             // To be deleted
-            // alert("too wide! width: " + img.width + ", height: " + img.height);
-            scalingFactor = maxTextureSize / img.width
-        } else {
-            // To be deleted
-            // alert("too tall! width: " + img.width + ", height: " + img.height);
-            scalingFactor = maxTextureSize / img.height
-        }
+        // alert("width: " + img.width + ", height: " + img.height); 
+        let cvs = document.createElement("canvas");
+        let ctx = cvs.getContext("2d");
+        let scalingFactor = maxTextureSize / (img.width >= img.height ? img.width : img.height);
         cvs.width = img.width * scalingFactor;
         cvs.height = img.height * scalingFactor;
         ctx.scale(scalingFactor, scalingFactor);
@@ -296,17 +290,27 @@ function createCanvas(opt = <any>{}) {
 }
 
 // Prevents the screen from going to sleep on mobile
-function enableNoSleep() {
-  awake.enable();
+// function enableNoSleep() {
+  // awake.enable();
   // alert("no more sleeping")
-  document.getElementById("tilt").removeEventListener('click', enableNoSleep);
-}
+  // document.getElementById("tilt").removeEventListener('click', enableNoSleep);
+  // document.getElementById("spin").removeEventListener('click', enableNoSleep);
+// }
+
+// Prevents the screen from going to sleep on mobile
+// function disableNoSleep() {
+  // awake.disable();
+  // alert("no more sleeping")
+  // document.getElementById("tilt").addEventListener('click', enableNoSleep);
+  // document.getElementById("spin").addEventListener('click', enableNoSleep);
+// }
 
 // Calculates the orientation of the mobile device
 function recalculateOrientation() {
   // If taller than wide, vertical (0-vertical, 1-cw, 2-upside down, 3-ccw)
   portrait = canvasSize[1] > canvasSize[0] ? (currAcc[1] >= 0 ? 0 : 2)
                                            : (currAcc[0] >= 0 ? 3 : 1);
+  // workaround for the horizontal SONY tablet
   if (tablet)
     portrait = (portrait + 1) % 4
   if (tilt)
@@ -323,10 +327,6 @@ function viewerSetup(viewer) {
     document.body.onkeydown = checkKeyDown;
     document.body.onkeyup = checkKeyUp;
   }
-
-  // Set up checkbox handlers
-  // document.getElementById("invert").onclick = invertDrag;
-  // document.getElementById("toggle").onclick = toggleSpin;
 
   // Set up button handlers
   (<HTMLImageElement>document.querySelector((mobile ? ".mobile" : ".desktop") + ".icon#spin")).onclick = toggleSpin;
@@ -405,25 +405,38 @@ function shiftOff() {
 
 // Toggles auto spin
 function toggleSpin() {
+  if (tilt) toggleTilt();
+
   autoSpin = !autoSpin;
-  
   let spinButton = <HTMLImageElement>document.querySelector(
                    (mobile ? ".mobile" : ".desktop") + ".icon#spin");
-  spinButton.src = imagePath + (autoSpin ? "stop.png" : "rotate.png")
+  spinButton.src = imagePath + (autoSpin ? "stop.png" : "rotate.png");
+  if (autoSpin) {
+    // alert("enabling nosleep")
+    awake.enable();
+  } else if (mobile && !autoSpin && !tilt) {
+    // alert("disabling nosleep")
+    awake.disable();
+  }
 }
 
 // Toggles the tilt controls, sets the HTML button text
 function toggleTilt() {
-  tilt = !tilt;
+  if (autoSpin) toggleSpin();
 
+  tilt = !tilt;
   let tiltButton = <HTMLImageElement>document.querySelector("#tilt")
   if (tilt) {
     tiltButton.src = imagePath + "iphone.png";
     initRot = currRot;
+    // alert("enabling nosleep")
+    awake.enable();
   } else {
     tiltButton.src = imagePath + "tilt.png";
+  }
+  if (mobile && !autoSpin && !tilt) {
+    // alert("disabling nosleep")
     awake.disable();
-    tiltButton.addEventListener('click', enableNoSleep);
   }
 }
 
