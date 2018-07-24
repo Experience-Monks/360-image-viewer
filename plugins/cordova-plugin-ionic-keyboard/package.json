@@ -1,0 +1,59 @@
+{
+  "_from": "cordova-plugin-ionic-keyboard@2.0.5",
+  "_id": "cordova-plugin-ionic-keyboard@2.0.5",
+  "_inBundle": false,
+  "_integrity": "sha512-ygwK+U7Vs7OJJYsDrWAxhegHfvuRRpMC3Y8RhQSVLfv4ELrXtkCUjD+UfsDQ3aObpvxGLTvcVrOw5p04dPXy3w==",
+  "_location": "/cordova-plugin-ionic-keyboard",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "cordova-plugin-ionic-keyboard@2.0.5",
+    "name": "cordova-plugin-ionic-keyboard",
+    "escapedName": "cordova-plugin-ionic-keyboard",
+    "rawSpec": "2.0.5",
+    "saveSpec": null,
+    "fetchSpec": "2.0.5"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-ionic-keyboard/-/cordova-plugin-ionic-keyboard-2.0.5.tgz",
+  "_shasum": "c7c35ffd8f6a1ef77e27a1eee70ccaa2e94f99e1",
+  "_spec": "cordova-plugin-ionic-keyboard@2.0.5",
+  "_where": "/Users/william/Documents/GitHub/my360-image-viewer",
+  "author": {
+    "name": "Apache Software Foundation"
+  },
+  "bugs": {
+    "url": "https://github.com/ionic-team/cordova-plugin-ionic-keyboard/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "Ionic Keyboard Plugin",
+  "devDependencies": {
+    "np": "^2.16.0",
+    "sync-cordova-xml": "^0.4.0"
+  },
+  "homepage": "https://github.com/ionic-team/cordova-plugin-ionic-keyboard#readme",
+  "keywords": [
+    "cordova",
+    "keyboard",
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android"
+  ],
+  "license": "Apache 2.0",
+  "name": "cordova-plugin-ionic-keyboard",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ionic-team/cordova-plugin-ionic-keyboard.git"
+  },
+  "scripts": {
+    "deploy": "np --yolo",
+    "sync_plugin_xml": "sync-cordova-xml package.json plugin.xml --output=plugin.xml",
+    "version": "npm run sync_plugin_xml && git add plugin.xml"
+  },
+  "version": "2.0.5"
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, shrink-to-fit=0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title>My 360-image-viewer</title>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <img class="left arrow" id="left" src="../../assets/imgs/left.png">
+  <img class="right arrow" id="right" src="../../assets/imgs/right.png">
+  
+  <div class="left info">
+    <ul>
+      <li>
+        <img class="desktop icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">
+        <img class="mobile icon" id="tilt" src="../../assets/imgs/tilt.png" style="display: none">
+      </li>
+      <li>
+        <img class="desktop icon" id="invert" src="../../assets/imgs/invert.png" style="display: none">
+        <img class="mobile icon" id="spin" src="../../assets/imgs/rotate.png" style="display: none">
+      </li>
+      <li>
+        <label for="upload">
+            <img class="icon" src="../../assets/imgs/upload.png"> </label>
+          <input id="upload" type="file" style="display: none">
+        </li>
+    </ul>
+  </div>
+
+  <div class="right info" style="display: none">
+    <div class="hr"></div>
+    <p>Press SPACE to toggle auto spin</p>
+    <p>Use the ARROW KEYS to move around</p>
+    <p>Hold SHIFT and move the cursor to pan around</p>
+  </div>
+
+  <div id="drop-region" style="display: none"></div>
+  
+  <script src="bundle.js"></script>
+</body>
+
+</html>

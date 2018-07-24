@@ -1,0 +1,55 @@
+{
+  "_from": "cordova-plugin-device-gyroscope@0.2.2",
+  "_id": "cordova-plugin-device-gyroscope@0.2.2",
+  "_inBundle": false,
+  "_integrity": "sha512-jEPYKEPxCLOQAG+qRWyubgJTl8kX7DjAfa3R+L7HPpEXwcZoNBcJUV22qv/xjJeaN/8B58IQTv8MyIoI28IrZg==",
+  "_location": "/cordova-plugin-device-gyroscope",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "cordova-plugin-device-gyroscope@0.2.2",
+    "name": "cordova-plugin-device-gyroscope",
+    "escapedName": "cordova-plugin-device-gyroscope",
+    "rawSpec": "0.2.2",
+    "saveSpec": null,
+    "fetchSpec": "0.2.2"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-device-gyroscope/-/cordova-plugin-device-gyroscope-0.2.2.tgz",
+  "_shasum": "0095b23c1884f0b99317a6a1de31075b5163f0b6",
+  "_spec": "cordova-plugin-device-gyroscope@0.2.2",
+  "_where": "/Users/william/Documents/GitHub/my360-image-viewer",
+  "author": {
+    "name": "Alexis Tacnet"
+  },
+  "bugs": {
+    "url": "https://github.com/fuegowolf/cordova-plugin-device-gyroscope/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-device-gyroscope",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "deprecated": false,
+  "description": "Cordova plugin to access the device gyroscope. ",
+  "homepage": "https://github.com/fuegowolf/cordova-plugin-device-gyroscope",
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "license": "MIT",
+  "name": "cordova-plugin-device-gyroscope",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fuegowolf/cordova-plugin-device-gyroscope.git"
+  },
+  "version": "0.2.2"
+}
