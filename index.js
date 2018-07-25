@@ -71,7 +71,6 @@ function create360Viewer (opt) {
     frag: [
       'precision highp float;',
       'uniform sampler2D map;',
-      'uniform vec4 color;',
       'varying vec2 vUv;',
       'void main() {',
       '  vec2 uv = 1.0 - vUv;',
