@@ -12,7 +12,7 @@
   "dependencies": {
     "defined": "^1.0.0",
     "object-assign": "^4.1.1",
-    "orbit-controls": "^1.2.0",
+    "orbit-controls": "^1.2.4",
     "perspective-camera": "^2.0.1",
     "primitive-sphere": "^3.0.0",
     "raf-loop": "^1.1.3",
