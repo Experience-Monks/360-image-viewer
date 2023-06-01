@@ -60,7 +60,7 @@ Options:
 - `damping` — a scalar for damping/spring, default 0.275
 - `clearColor` — a RGBA clear color, default `[ 0, 0, 0, 0 ]` (ie. transparent)
 
-You can also pass [orbit-controls](https://github.com/Jam3/orbit-controls) options, for example `phi` as the initial rotation, or passing `{ rotate: fale }` to ignore mouse/touch rotation.
+You can also pass [orbit-controls](https://github.com/Jam3/orbit-controls) options, for example `phi` as the initial rotation, or passing `{ rotate: false }` to ignore mouse/touch rotation.
 
 The `image` should be a DOM Image or Video element, and should already be loaded.
 
